@@ -14,15 +14,19 @@ public class Driver {
 		for (int i = 0; i < args.length; i++) {
 
 			if (args[i].equalsIgnoreCase("-index")) {
+				
 				if (args[i + 1] == null || !args[i + 1].toLowerCase().contains(".json")) {
-					System.out.println("default index.json created since no file provided");
-				} else {
+					System.out.println("default 'index.json' created since no file provided");
+				} else if (args[i + 1].toLowerCase().contains(".json")) {
 					System.out.println(args[i + 1]);
 				}
+				
 				// maybe this is enough? i can technically still create the
-				// index if I construct it after
+				// index if I construct it after elif case
+				
 			} else if (args[i].equalsIgnoreCase("-dir")) {
-				// check the next directory in args
+				// check the next args for a directory
+				System.out.println(args[i+1]);
 			}
 		}
 
