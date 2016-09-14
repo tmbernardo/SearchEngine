@@ -2,5 +2,7 @@
 // and location into an inverted index data structure.
 
 public class wordIndex {
-
+	
+	private int count;
+	
 }

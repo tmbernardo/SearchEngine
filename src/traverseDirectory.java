@@ -11,13 +11,24 @@ import java.nio.file.Paths;
 // Use the UTF-8 character encoding for all file processing, including reading and writing.
 
 public class traverseDirectory {
-	private static Path path;
+	
 
-	public traverseDirectory() {
-	}
+	public traverseDirectory() {}
 
 	public traverseDirectory(String inputPath) {
-		path = Paths.get(inputPath);
+		
+		Path path = Paths.get(inputPath);
+		
+		if (Files.isDirectory(path)) {
+			traverse(path);
+			
+		} else if (path.toString().endsWith(".txt")) {
+			// save the text file location
+			System.out.println(path);
+		}
+	}
+
+	private static void traverse(Path path) {
 
 		try (DirectoryStream<Path> listing = Files.newDirectoryStream(path)) {
 
@@ -28,25 +39,15 @@ public class traverseDirectory {
 
 					traverse(file);
 
-				} else if (file.endsWith(".txt")) {
+				} else if (file.toString().endsWith(".txt")) {
 					// Add the file size next to the name
-					System.out.printf(file.toString());
+					System.out.println(file);
 				}
 			}
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			// TODO catch exception properly
 			e.printStackTrace();
-		}
-	}
-
-	public static void traverse(Path directory) {
-
-		if (Files.isDirectory(directory)) {
-			traverse(directory);
-		} else if (directory.endsWith(".txt")) {
-			// save the text file location
-			System.out.println(directory.toString()); // path not printing
 		}
 	}
 }
