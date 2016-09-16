@@ -8,10 +8,10 @@ public class Driver {
 
 			if (args[i].equalsIgnoreCase("-index")) {
 
-				if (args[i + 1] == null || !args[i + 1].toLowerCase().contains(".json")) {
+				if (args[i + 1] == null || !args[i + 1].toLowerCase().endsWith(".json")) {
 					System.out.println("default 'index.json' created since no file provided");
 
-				} else if (args[i + 1].toLowerCase().contains(".json")) {
+				} else if (args[i + 1].toLowerCase().endsWith(".json")) {
 					System.out.println(args[i + 1]);
 				}
 
