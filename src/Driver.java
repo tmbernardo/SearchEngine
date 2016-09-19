@@ -29,7 +29,6 @@ public class Driver {
 				words = new wordIndex(fileLocations);
 			}
 		}
-		// handle the lack of -index flag so that it doesn't create a JSON file
 		
 		if (jsonFileName != null){
 			new JSONFileWriter(words.getWordIndex(), Paths.get(jsonFileName));
