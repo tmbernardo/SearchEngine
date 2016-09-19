@@ -1,29 +1,40 @@
+import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.Arrays;
+import java.util.ArrayList;
 
 public class Driver {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
+		traverseDirectory directory;
+		wordIndex words = null;
+		ArrayList<String> fileLocations = null;
+		String jsonFileName = null;
+		
 		for (int i = 0; i < args.length; i++) {
 
 			if (args[i].equalsIgnoreCase("-index")) {
 
-				if (args[i + 1] == null || !args[i + 1].toLowerCase().contains(".json")) {
-					System.out.println("default 'index.json' created since no file provided");
+				if (i+1 >= args.length) {
+					jsonFileName = "index.json";
 
 				} else if (args[i + 1].toLowerCase().contains(".json")) {
-					System.out.println(args[i + 1]);
+					jsonFileName = args[i+1];
 				}
 
-			} else if (args[i].equalsIgnoreCase("-dir")) {
+			} else if (args[i].equalsIgnoreCase("-dir") && i + 1 < args.length) {
 				// check the next args for a directory
-
-				new traverseDirectory(args[i + 1]);
-				System.out.println("Path: " + Paths.get(args[i + 1]));
+				
+				directory = new traverseDirectory(args[i + 1]);
+				fileLocations = directory.getFileLocations();
+				words = new wordIndex(fileLocations);
 			}
 		}
-
-		System.out.println(Arrays.toString(args));
+		// handle the lack of -index flag so that it doesn't create a JSON file
+		
+		if (jsonFileName != null){
+			new JSONFileWriter(words.getWordIndex(), Paths.get(jsonFileName));
+		}
+		
 	}
 
 }

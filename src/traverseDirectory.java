@@ -3,6 +3,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 // Create code that is able to traverse a directory and 
 // return a list of all the text files found within that directory.
@@ -12,6 +13,7 @@ import java.nio.file.Paths;
 
 public class traverseDirectory {
 	
+	private ArrayList<String> fileLocations = new ArrayList<>();
 
 	public traverseDirectory() {}
 
@@ -28,20 +30,18 @@ public class traverseDirectory {
 		}
 	}
 
-	private static void traverse(Path path) {
+	private void traverse(Path path) {
 
 		try (DirectoryStream<Path> listing = Files.newDirectoryStream(path)) {
 
 			for (Path file : listing) {
-
 				// Check if this is a subdirectory
 				if (Files.isDirectory(file)) {
-
 					traverse(file);
 
-				} else if (file.toString().endsWith(".txt")) {
+				} else if (file.toString().toLowerCase().endsWith(".txt")) {
 					// Add the file size next to the name
-					System.out.println(file);
+					fileLocations.add(file.normalize().toString());
 				}
 			}
 
@@ -50,4 +50,8 @@ public class traverseDirectory {
 			e.printStackTrace();
 		}
 	}
+	
+	public ArrayList<String> getFileLocations(){ return fileLocations; }
+	
+	
 }
