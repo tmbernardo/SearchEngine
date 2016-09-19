@@ -29,7 +29,7 @@ public class Driver {
 				words = new wordIndex(fileLocations);
 			}
 		}
-		
+		//
 		if (jsonFileName != null){
 			new JSONFileWriter(words.getWordIndex(), Paths.get(jsonFileName));
 		}
