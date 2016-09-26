@@ -5,42 +5,45 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
-// Create code that is able to traverse a directory and 
-// return a list of all the text files found within that directory.
-// Store the normalized relative path for file locations as a String object.
-// Do not convert the file paths to absolute paths!
-// Use the UTF-8 character encoding for all file processing, including reading and writing.
-
+/**
+ * This class traverses a directory and returns a list of all text files found
+ * within directory
+ */
 public class traverseDirectory {
-	
+
 	private ArrayList<String> fileLocations = new ArrayList<>();
 
-	public traverseDirectory() {}
-
-	public traverseDirectory(String inputPath) {
-		
-		Path path = Paths.get(inputPath);
-		
-		if (Files.isDirectory(path)) {
-			traverse(path);
-			
-		} else if (path.toString().endsWith(".txt")) {
-			// save the text file location
-			System.out.println(path);
-		}
+	public traverseDirectory() {
 	}
 
+	/**
+	 * Constructor: requires input directory/file
+	 * 
+	 * @param inputPath
+	 *            directory/file location
+	 */
+	public traverseDirectory(String inputPath) {
+		Path path = Paths.get(inputPath);
+		traverse(path);
+	}
+
+	/**
+	 * Traverses directory recursively and saves the text files
+	 * 
+	 * @param path
+	 *            directory/file location passed through from constructor
+	 */
 	private void traverse(Path path) {
 
 		try (DirectoryStream<Path> listing = Files.newDirectoryStream(path)) {
 
 			for (Path file : listing) {
-				// Check if this is a subdirectory
+				// Checks if input is a subdirectory
 				if (Files.isDirectory(file)) {
 					traverse(file);
-
+					// If path is a .txt file then path is normalized and added
+					// to fileLocations ArrayList
 				} else if (file.toString().toLowerCase().endsWith(".txt")) {
-					// Add the file size next to the name
 					fileLocations.add(file.normalize().toString());
 				}
 			}
@@ -50,8 +53,12 @@ public class traverseDirectory {
 			e.printStackTrace();
 		}
 	}
-	
-	public ArrayList<String> getFileLocations(){ return fileLocations; }
-	
-	
+
+	/**
+	 * Traverses dir
+	 */
+	public ArrayList<String> getFileLocations() {
+		return fileLocations;
+	}
+
 }
