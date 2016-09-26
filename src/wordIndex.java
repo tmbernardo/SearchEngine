@@ -75,4 +75,5 @@ public class wordIndex {
 		return this.words;
 	}
 
+	// TODO: Add toJson method instead of running JSONFileWriter through driver
 }
