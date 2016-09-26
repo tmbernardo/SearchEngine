@@ -55,7 +55,7 @@ public class traverseDirectory {
 	}
 
 	/**
-	 * Traverses dir
+	 * Returns the ArrayList of file locations
 	 */
 	public ArrayList<String> getFileLocations() {
 		return fileLocations;
