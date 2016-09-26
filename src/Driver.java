@@ -18,12 +18,12 @@ public class Driver {
         	directory = new traverseDirectory(parser.getValue(dir));
     		fileLocations = directory.getFileLocations();
     		words = new wordIndex(fileLocations);
+    		
+    		if(parser.hasFlag(index)){
+    			jsonFileName = parser.getValue(index, jsonFileName);
+    			new JSONFileWriter(words.getWordIndex(), Paths.get(jsonFileName));
+    		}
         }
-		
-		if(parser.hasFlag(index)){
-			jsonFileName = parser.getValue(index, jsonFileName);
-			new JSONFileWriter(words.getWordIndex(), Paths.get(jsonFileName));
-		}
 	}
 
 }
