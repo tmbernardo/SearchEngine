@@ -9,8 +9,10 @@ import java.util.ArrayList;
  * This class traverses a directory and returns a list of all text files found
  * within directory
  */
-public class traverseDirectory {
+public class traverseDirectory { // TODO Make this like a job title, not an action... DirectoryTraverser
 
+	// TODO Always initialize in the constructor
+	// TODO Actually, remove this entirely!
 	private ArrayList<String> fileLocations = new ArrayList<>();
 
 	public traverseDirectory() {
@@ -60,5 +62,21 @@ public class traverseDirectory {
 	public ArrayList<String> getFileLocations() {
 		return fileLocations;
 	}
+	
+	/* TODO
+	public static List<String> traverse(Path path) {
+		ArrayList<String> paths = new ArrayList<>();
+		traverse(path, paths);
+		return paths;
+	}
+	
+	
+	private static void traverse(Path path, List<String> paths) {
+		if (directory)
+			traverse(subdirectory, paths)
+		else if text file
+			add to paths
+	}
+	*/
 
 }
