@@ -46,7 +46,6 @@ public class ArgumentParser {
 	 * @see #isValue(String)
 	 */
 	public void parseArguments(String[] args) {
-		// TODO: Fill this in.
 		for (int i = 0; i < args.length; i++) {
 			if(isFlag(args[i])){
 				argumentMap.put(args[i], null);
@@ -67,10 +66,7 @@ public class ArgumentParser {
 	 * @return {@code true} if the argument is a valid flag
 	 */
 	public static boolean isFlag(String arg) {
-		if(arg != null && arg.trim().startsWith("-") && arg.trim().length() > 1){
-			return true;
-		}
-		return false;
+		return (arg != null && arg.trim().startsWith("-") && arg.trim().length() > 1);
 	}
 
 	/**
@@ -82,10 +78,7 @@ public class ArgumentParser {
 	 * @return {@code true} if the argument is a valid value
 	 */
 	public static boolean isValue(String arg) {
-		if(arg != null && !arg.startsWith("-") && !arg.trim().isEmpty()){
-			return true;
-		}
-		return false;
+		return (arg != null && !arg.startsWith("-") && !arg.trim().isEmpty());
 	}
 
 	/**
@@ -105,13 +98,7 @@ public class ArgumentParser {
 	 * @return {@code true} if flag exists
 	 */
 	public boolean hasFlag(String flag) {
-		if(argumentMap.containsKey(flag)){
-			return true;
-		}
-		return false;
-		
-		// TODO Can do this in one line
-		// return argumentMap.containsKey(flag);
+		return argumentMap.containsKey(flag);
 	}
 
 	/**
@@ -122,10 +109,7 @@ public class ArgumentParser {
 	 * @return {@code true} if the flag exists and has a non-null value
 	 */
 	public boolean hasValue(String flag) {
-		if(hasFlag(flag) && argumentMap.get(flag) != null){
-			return true;
-		}
-		return false;
+		return (hasFlag(flag) && argumentMap.get(flag) != null);
 	}
 
 	/**
@@ -187,7 +171,6 @@ public class ArgumentParser {
 
 	@Override
 	public String toString() {
-		// You do not need to modify this method.
 		return argumentMap.toString();
 	}
 }

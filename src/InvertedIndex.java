@@ -16,16 +16,9 @@ import java.util.TreeSet;
  * collection (words) structure.
  */
 public class InvertedIndex {
-	// TODO Use "Refactor" in Eclipse to rename anything
 
-	// TODO Use the final keyword
-	private TreeMap<String, TreeMap<String, TreeSet<Integer>>> words;
+	private final TreeMap<String, TreeMap<String, TreeSet<Integer>>> words;
 
-
-	public InvertedIndex() {
-	}
-
-	// TODO Remove this constructor!
 	/**
 	 * Constructor: takes in an ArrayList containing the file locations
 	 * 
@@ -48,7 +41,7 @@ public class InvertedIndex {
 	 * words, then adds the words into the TreeMap words
 	 */
 	// TODO private static void parseWords(Path inputFile, InvertedIndex index)
-	private void parseWords(Path inputFile) throws IOException {
+	public void parseWords(Path inputFile) throws IOException {
 		int lineNumber = 0;
 
 		try (BufferedReader reader = Files.newBufferedReader(inputFile, Charset.forName("UTF-8"));) {
@@ -67,10 +60,11 @@ public class InvertedIndex {
 
 		}
 	}
+	
+	// TODO add search functionality that goes through words index
 
-	// TODO All "data structure" classes have public add method.
 	// TODO Take a string instead of a path
-	private void add(String word, int lineNumber, Path path) {
+	public void add(String word, int lineNumber, Path path) {
 		String fileName = path.toString(); // TODO Do this conversion in the builder class
 		if (!words.containsKey(word)) {
 			words.put(word, new TreeMap<>());

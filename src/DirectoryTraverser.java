@@ -9,13 +9,13 @@ import java.util.ArrayList;
  * This class traverses a directory and returns a list of all text files found
  * within directory
  */
-public class traverseDirectory { // TODO Make this like a job title, not an action... DirectoryTraverser
+public class DirectoryTraverser {
 
 	// TODO Always initialize in the constructor
 	// TODO Actually, remove this entirely!
 	private ArrayList<String> fileLocations = new ArrayList<>();
 
-	public traverseDirectory() {
+	public DirectoryTraverser() {
 	}
 
 	/**
@@ -24,7 +24,7 @@ public class traverseDirectory { // TODO Make this like a job title, not an acti
 	 * @param inputPath
 	 *            directory/file location
 	 */
-	public traverseDirectory(String inputPath) {
+	public DirectoryTraverser(String inputPath) {
 		Path path = Paths.get(inputPath);
 		traverse(path);
 	}
