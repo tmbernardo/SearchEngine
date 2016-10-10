@@ -28,7 +28,6 @@ public class ArgumentParser {
 	 * @see #parseArguments(String[])
 	 */
 	public ArgumentParser(String[] args) {
-		// You do not need to modify this method.
 		this();
 		parseArguments(args);
 	}

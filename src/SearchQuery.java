@@ -1,9 +1,9 @@
 
 
 public class SearchQuery implements Comparable<SearchQuery>{
+	
 	private String query;
 	private String where;
-	
 	private int count;
 	private int index;
 	

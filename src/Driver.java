@@ -22,18 +22,20 @@ public class Driver {
 		String resultsFileName = "results.json";
 		String jsonFileName = "index.json";
 
-		InvertedIndex words = null;
+		ArgumentParser argParser = new ArgumentParser();
+		argParser.parseArguments(args);
 
-		ArgumentParser parser = new ArgumentParser();
-		parser.parseArguments(args);
-
-		if (parser.hasFlag(dir) && parser.hasValue(dir)) {
-			DirectoryTraverser directory = new DirectoryTraverser(parser.getValue(dir));
+		if (argParser.hasFlag(dir) && argParser.hasValue(dir)) {
+			DirectoryTraverser directory = new DirectoryTraverser(argParser.getValue(dir));
 			ArrayList<String> fileLocations = directory.getFileLocations();
-			words = new InvertedIndex(fileLocations);
+			InvertedIndex words = new InvertedIndex(fileLocations);
 			
-			if (parser.hasFlag(index)) {
-				jsonFileName = parser.getValue(index, jsonFileName);
+			if (argParser.hasFlag(exact)){
+				words.exactSearch(argParser.getValue(exact));
+			}
+			
+			if (argParser.hasFlag(index)) {
+				jsonFileName = argParser.getValue(index, jsonFileName);
 				new JSONFileWriter(words.getWordIndex(), Paths.get(jsonFileName));
 			}
 		}

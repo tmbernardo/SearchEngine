@@ -64,7 +64,7 @@ public class JSONFileWriter {
 	}
 	
 	// TODO create overload constructor
-	// JSONFileWriter(List<SearchQuery> queries) 
+	// JSONFileWriter(List<SearchQuery> queries)
 	
 	private static void writeFileName(TreeMap<String, TreeSet<Integer>> fileNames, BufferedWriter writer, int tabN) throws IOException{
 		writer.write("{" + END);

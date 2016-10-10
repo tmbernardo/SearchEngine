@@ -1,10 +1,11 @@
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -19,6 +20,11 @@ public class InvertedIndex {
 
 	private final TreeMap<String, TreeMap<String, TreeSet<Integer>>> words;
 
+	
+	public InvertedIndex(){
+		this.words = new TreeMap<>();
+	}
+
 	/**
 	 * Constructor: takes in an ArrayList containing the file locations
 	 * 
@@ -27,45 +33,60 @@ public class InvertedIndex {
 	 */
 	public InvertedIndex(ArrayList<String> fileLocations) throws IOException {
 
-		words = new TreeMap<>(); // TODO This should be in the default constructor, can call this() here to initialize it
+		this();
 
 		for (String string : fileLocations) {
-			parseWords(Paths.get(string));
-		}
-	}
-
-	// TODO This method belongs somewhere else. Could put this in a "InvertedIndexBuilder" class instead.
-	// TODO To make your future projects easier, make it a public static method.
-	/**
-	 * Goes through the input file passed through from constructor, parses the
-	 * words, then adds the words into the TreeMap words
-	 */
-	// TODO private static void parseWords(Path inputFile, InvertedIndex index)
-	public void parseWords(Path inputFile) throws IOException {
-		int lineNumber = 0;
-
-		try (BufferedReader reader = Files.newBufferedReader(inputFile, Charset.forName("UTF-8"));) {
-
-			String line = null;
-
-			while ((line = reader.readLine()) != null) {
-				for (String word : line.replaceAll("\\p{Punct}+", "").split(" ")) {
-					if (!word.trim().isEmpty()) {
-						lineNumber++;
-						// index.add(...)
-						add(word.trim().toLowerCase(), lineNumber, inputFile);
-					}
-				}
-			}
-
+			InvertedIndexBuilder.parseWords(Paths.get(string), this);
 		}
 	}
 	
-	// TODO add search functionality that goes through words index
+	// TODO add EXACT search functionality that goes through words index
+	
+	public void exactSearch(String inputFile) throws IOException {
+		List<SearchQuery> queryList = QueryParser.parseQuery(Paths.get(inputFile));
+		// needs a treeset with a Collections sort that compares frequency>position>location
+		
+		for (SearchQuery SearchQuery : queryList) {
+			
+			// convert this to a triply nested arraylist instead
+			TreeMap<String, TreeMap<String, TreeSet<Integer>>> querySets = new TreeMap<>();
+			//convert to doubly nested arraylist instead
+			TreeMap<String, TreeSet<Integer>> fileMatches = new TreeMap<>();
+			
+			for (String string : SearchQuery.getQuery().split(" ")) {
+				if(words.containsKey(string)){
+					querySets.put(string, words.get(string));
+					fileMatches.putAll(words.get(string));
+				}
+			}
+			
+			for (String key : querySets.keySet()) {
+				// TODO ASK: is there a better way to do this?
+				fileMatches.keySet().retainAll(querySets.get(key).keySet());
+			}
+			
+			for (String word : querySets.keySet()) {
+				for (String fileMatch : fileMatches.keySet()) {
+					fileMatches.get(fileMatch).retainAll(querySets.get(word).get(fileMatch));
+				}
+			}
+			
+			for (String filematch : fileMatches.keySet()) {
+				System.out.println(filematch);
+			}
+			// compareto will be able 
+//			Collections.sort(querySets, );
+			
+		}
+	}
+	
+	// TODO add PARTIAL search functionality that goes through words index
+	public void partialSearch(Path inputfile) throws IOException {
+		
+	}
 
-	// TODO Take a string instead of a path
-	public void add(String word, int lineNumber, Path path) {
-		String fileName = path.toString(); // TODO Do this conversion in the builder class
+	public void add(String word, int lineNumber, String path) {
+		String fileName = path;
 		if (!words.containsKey(word)) {
 			words.put(word, new TreeMap<>());
 		}
