@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-//Create code that handles storing a word, file path,
+// Create code that handles storing a word, file path,
 // and location into an inverted index data structure.
 
 /**

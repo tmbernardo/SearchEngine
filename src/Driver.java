@@ -47,6 +47,7 @@ public class Driver {
 			if (argParser.hasFlag(index)) {
 				jsonFileName = argParser.getValue(index, jsonFileName);
 				new JSONFileWriter(words.getWordIndex(), Paths.get(jsonFileName));
+				// still need to change
 			}
 		}
 	}
