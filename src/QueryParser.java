@@ -27,7 +27,7 @@ public class QueryParser {
 				}
 			}
 		} catch (Exception e) {
-			System.out.println(e);
+			System.out.println("File error");
 		}
 
 		Collections.sort(queryList);
