@@ -12,28 +12,38 @@ public class Driver {
 
 	// TODO Never throw exceptions in main.
 	public static void main(String[] args) throws IOException {
-		
+
 		String dir = "-dir";
 		String index = "-index";
-		String query = "-query";
 		String exact = "-exact";
+		String query = "-query";
 		String results = "-results";
-		
-		String resultsFileName = "results.json";
-		String jsonFileName = "index.json";
+
+		String resultsFileName;
+		String jsonFileName;
+		Boolean writeResult = true;
 
 		ArgumentParser argParser = new ArgumentParser();
 		argParser.parseArguments(args);
+
+		writeResult = argParser.hasFlag(results);
+
+		resultsFileName = argParser.hasValue(results) ? argParser.getValue(results) : "results.json";
+		jsonFileName = argParser.hasValue(index) ? argParser.getValue(index) : "index.json";
 
 		if (argParser.hasFlag(dir) && argParser.hasValue(dir)) {
 			DirectoryTraverser directory = new DirectoryTraverser(argParser.getValue(dir));
 			ArrayList<String> fileLocations = directory.getFileLocations();
 			InvertedIndex words = new InvertedIndex(fileLocations);
-			
-			if (argParser.hasFlag(exact)){
-				words.exactSearch(argParser.getValue(exact));
+
+			if (argParser.hasValue(exact)) {
+				words.exactSearch(argParser.getValue(exact), resultsFileName, writeResult);
 			}
-			
+
+			if (argParser.hasValue(query)) {
+				words.partialSearch(argParser.getValue(query), resultsFileName, writeResult);
+			}
+
 			if (argParser.hasFlag(index)) {
 				jsonFileName = argParser.getValue(index, jsonFileName);
 				new JSONFileWriter(words.getWordIndex(), Paths.get(jsonFileName));

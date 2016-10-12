@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -38,9 +40,11 @@ public class JSONFileWriter {
 		Arrays.fill(tabs, TAB);
 		return String.valueOf(tabs);
 	}
-	
-	public JSONFileWriter(TreeMap<String, TreeMap<String, TreeSet<Integer>>> words, Path path){
-		
+
+	// TODO for code review: take out constructors and just run as static
+	// methods
+	public JSONFileWriter(TreeMap<String, TreeMap<String, TreeSet<Integer>>> words, Path path) {
+
 		try (BufferedWriter writer = writerCreator(path)) {
 
 			writer.write("{" + END);
@@ -62,11 +66,55 @@ public class JSONFileWriter {
 			System.err.println("IOException | UnsupportedEncodingException | FileNotFoundException");
 		}
 	}
-	
-	// TODO create overload constructor
-	// JSONFileWriter(List<SearchQuery> queries)
-	
-	private static void writeFileName(TreeMap<String, TreeSet<Integer>> fileNames, BufferedWriter writer, int tabN) throws IOException{
+
+	public JSONFileWriter(TreeMap<String, ArrayList<SearchQuery>> SearchQueries, Path path, String stuff) {
+
+		try (BufferedWriter writer = writerCreator(path)) {
+
+			writer.write("{" + END);
+
+			for (String query : SearchQueries.keySet()) {
+
+				writer.write(TAB + quote(query) + ": ");
+
+				writeAttributes(SearchQueries.get(query), writer, 2);
+
+				if (query != SearchQueries.lastKey()) {
+					writer.write("," + END);
+				} else {
+					writer.write(END);
+				}
+			}
+			writer.write("}" + END);
+			writer.flush();
+
+		} catch (Exception e) {
+			System.err.println("IOException | UnsupportedEncodingException | FileNotFoundException");
+		}
+	}
+
+	private static void writeAttributes(List<SearchQuery> query, BufferedWriter writer, int tabN) throws IOException {
+		writer.write("[");
+
+		for (SearchQuery searchQuery : query) {
+			writer.write(END + tab(tabN) + "{" + END);
+			writer.write(tab(tabN + 1) + quote("where") + ": " + quote(searchQuery.getWhere()));
+			writer.write("," + END);
+			writer.write(tab(tabN + 1) + quote("count") + ": " + searchQuery.getCount());
+			writer.write("," + END);
+			writer.write(tab(tabN + 1) + quote("index") + ": " + searchQuery.getIndex());
+			writer.write(END);
+			writer.write(tab(tabN) + "}");
+
+			if (!searchQuery.equals(query.get(query.size() - 1))) {
+				writer.write(",");
+			}
+		}
+		writer.write("\n" + TAB + "]");
+	}
+
+	private static void writeFileName(TreeMap<String, TreeSet<Integer>> fileNames, BufferedWriter writer, int tabN)
+			throws IOException {
 		writer.write("{" + END);
 
 		for (String str : fileNames.keySet()) {
@@ -79,11 +127,10 @@ public class JSONFileWriter {
 				writer.write(END);
 			}
 		}
-		writer.write(tab(tabN - 1) +"}");
+		writer.write(tab(tabN - 1) + "}");
 	}
-	
-	private static void writeIntSet(TreeSet<Integer> elements, BufferedWriter writer, int tabN)
-			throws IOException {
+
+	private static void writeIntSet(TreeSet<Integer> elements, BufferedWriter writer, int tabN) throws IOException {
 
 		writer.write("[" + END);
 		for (Integer integer : elements) {

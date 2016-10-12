@@ -1,22 +1,13 @@
+import java.nio.file.Paths;
 
+public class SearchQuery implements Comparable<SearchQuery> {
 
-public class SearchQuery implements Comparable<SearchQuery>{
-	
-	private String query;
 	private String where;
 	private int count;
 	private int index;
-	
-	public SearchQuery(String query){
-		this.query = query;
-	}
 
-	public String getQuery() {
-		return query;
-	}
-
-	public void setQuery(String query) {
-		this.query = query;
+	public SearchQuery(String where) {
+		this.where = where;
 	}
 
 	public String getWhere() {
@@ -45,6 +36,26 @@ public class SearchQuery implements Comparable<SearchQuery>{
 
 	@Override
 	public int compareTo(SearchQuery compareQuery) {
-		return this.query.compareTo(compareQuery.getQuery());
+		int result = Integer.compare(this.count, compareQuery.count);
+
+		if (result == 0) {
+			result = Integer.compare(compareQuery.getIndex(), this.index);
+			if (result == 0) {
+				String file1 = Paths.get(this.where).normalize().toString();
+				String file2 = Paths.get(compareQuery.getWhere()).normalize().toString();
+
+				return file2.compareToIgnoreCase(file1);
+			}
+		}
+
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object compareQuery) {
+		if (compareQuery instanceof SearchQuery) {
+			return where.equals(((SearchQuery) compareQuery).getWhere());
+		}
+		return false;
 	}
 }
