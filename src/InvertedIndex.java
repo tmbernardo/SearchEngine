@@ -1,4 +1,3 @@
-import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,6 +7,8 @@ import java.util.TreeSet;
 
 // Create code that handles storing a word, file path,
 // and location into an inverted index data structure.
+// TODO create a helper class for exact and partial search
+// 
 
 /**
  * This class stores a word, file path, and location into a triply nested
@@ -16,9 +17,11 @@ import java.util.TreeSet;
 public class InvertedIndex {
 
 	private final TreeMap<String, TreeMap<String, TreeSet<Integer>>> words;
+	private final TreeMap<String, ArrayList<SearchQuery>> SearchQueries;
 
 	public InvertedIndex() {
 		this.words = new TreeMap<>();
+		this.SearchQueries = new TreeMap<>();
 	}
 
 	/**
@@ -27,7 +30,7 @@ public class InvertedIndex {
 	 * @param fileLocations
 	 *            ArrayList of file locations
 	 */
-	public InvertedIndex(ArrayList<String> fileLocations) throws IOException {
+	public InvertedIndex(List<String> fileLocations){
 
 		this();
 
@@ -36,10 +39,9 @@ public class InvertedIndex {
 		}
 	}
 
-	public void exactSearch(String inputFile, String path, Boolean write) throws IOException {
+	public void exactSearch(String inputFile){
 
 		List<String> queryList = QueryParser.parseQuery(inputFile);
-		TreeMap<String, ArrayList<SearchQuery>> SearchQueries = new TreeMap<>();
 
 		for (String SearchQuery : queryList) {
 
@@ -73,24 +75,19 @@ public class InvertedIndex {
 					Collections.reverse(SearchQueries.get(SearchQuery));
 				}
 			}
-			if (write) {
-				new JSONFileWriter(SearchQueries, Paths.get(path), "");
-			}
-
 		}
 	}
 
-	// TODO add PARTIAL search functionality that goes through words index
-	public void partialSearch(String inputfile, String path, Boolean write) throws IOException {
+	public void partialSearch(String inputfile){
 		List<String> queryList = QueryParser.parseQuery(inputfile);
-
-		TreeMap<String, ArrayList<SearchQuery>> SearchQueries = new TreeMap<>();
 
 		for (String SearchQuery : queryList) {
 
 			SearchQueries.put(SearchQuery, new ArrayList<>());
 
 			for (String string : SearchQuery.split(" ")) {
+				// TODO Send everything after this to the Searcher class
+				// Searcher.partialSearch(string, SearchQueries);
 
 				for (String word : words.keySet()) {
 
@@ -118,13 +115,8 @@ public class InvertedIndex {
 						Collections.sort(SearchQueries.get(SearchQuery));
 						Collections.reverse(SearchQueries.get(SearchQuery));
 					}
-
 				}
 			}
-			if (write) {
-				new JSONFileWriter(SearchQueries, Paths.get(path), "");
-			}
-
 		}
 	}
 
@@ -139,15 +131,12 @@ public class InvertedIndex {
 
 		words.get(word).get(fileName).add(lineNumber);
 	}
-
-	// TODO
-	// public void toJSON(Path outputFile) {
-	// JSONWriter.toJSON(words);
-	// }
-	// TODO: Add toJson method instead of running JSONFileWriter through driver
-
-	// TODO Nooooooooo, breaking encapsulation
-	public TreeMap<String, TreeMap<String, TreeSet<Integer>>> getWordIndex() {
-		return this.words;
+	
+	public void IndexToJSON(String outputFile) {
+		JSONFileWriter.IndexToJSON(Paths.get(outputFile), words);
+	}
+	
+	public void SearchResultsToJSON(String outputFile){
+		JSONFileWriter.SearchResultsToJSON(Paths.get(outputFile), SearchQueries);
 	}
 }

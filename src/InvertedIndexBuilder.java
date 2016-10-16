@@ -5,7 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 public class InvertedIndexBuilder {
 	
-	public static void parseWords(Path inputFile, InvertedIndex index) throws IOException {
+	public static void parseWords(Path inputFile, InvertedIndex index){
 		int lineNumber = 0;
 
 		try (BufferedReader reader = Files.newBufferedReader(inputFile, Charset.forName("UTF-8"));) {
@@ -20,6 +20,9 @@ public class InvertedIndexBuilder {
 				}
 			}
 
+		} catch (IOException e) {
+//			TODO Print out something nicer
+			e.printStackTrace();
 		}
 	}
 	

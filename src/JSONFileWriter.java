@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-//Output the inverted index to a text file in JSON format if the proper command-line parameters are provided. See the Output section below for specifics.
+//Output the inverted index to a text file in JSON format if the proper command-line parameters are provided.
 public class JSONFileWriter {
 	public static final char TAB = '\t';
 
@@ -40,12 +40,9 @@ public class JSONFileWriter {
 		Arrays.fill(tabs, TAB);
 		return String.valueOf(tabs);
 	}
-
-	// TODO for code review: take out constructors and just run as static
-	// methods
-	public JSONFileWriter(TreeMap<String, TreeMap<String, TreeSet<Integer>>> words, Path path) {
-
-		try (BufferedWriter writer = writerCreator(path)) {
+	
+	public static void IndexToJSON(Path outputFile, TreeMap<String, TreeMap<String, TreeSet<Integer>>> words){
+		try (BufferedWriter writer = writerCreator(outputFile)) {
 
 			writer.write("{" + END);
 
@@ -64,12 +61,12 @@ public class JSONFileWriter {
 
 		} catch (Exception e) {
 			System.err.println("IOException | UnsupportedEncodingException | FileNotFoundException");
+//			TODO Print out something nicer
 		}
 	}
-
-	public JSONFileWriter(TreeMap<String, ArrayList<SearchQuery>> SearchQueries, Path path, String stuff) {
-
-		try (BufferedWriter writer = writerCreator(path)) {
+	
+	public static void SearchResultsToJSON(Path outputFile, TreeMap<String, ArrayList<SearchQuery>> SearchQueries){
+		try (BufferedWriter writer = writerCreator(outputFile)) {
 
 			writer.write("{" + END);
 
@@ -90,6 +87,7 @@ public class JSONFileWriter {
 
 		} catch (Exception e) {
 			System.err.println("IOException | UnsupportedEncodingException | FileNotFoundException");
+//			TODO Print out something nicer
 		}
 	}
 
