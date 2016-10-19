@@ -46,10 +46,10 @@ public class ArgumentParser {
 	 */
 	public void parseArguments(String[] args) {
 		for (int i = 0; i < args.length; i++) {
-			if(isFlag(args[i])){
+			if (isFlag(args[i])) {
 				argumentMap.put(args[i], null);
-				if(i + 1 < args.length && isValue(args[i+1])){
-					argumentMap.put(args[i], args[i+1]);
+				if (i + 1 < args.length && isValue(args[i + 1])) {
+					argumentMap.put(args[i], args[i + 1]);
 				}
 			}
 		}
@@ -121,7 +121,7 @@ public class ArgumentParser {
 	 *         not exist
 	 */
 	public String getValue(String flag) {
-		if(hasValue(flag)){
+		if (hasValue(flag)) {
 			return argumentMap.get(flag);
 		}
 		return null;
@@ -139,7 +139,7 @@ public class ArgumentParser {
 	 *         the value is {@code null}
 	 */
 	public String getValue(String flag, String defaultValue) {
-		if(hasValue(flag)){
+		if (hasValue(flag)) {
 			return getValue(flag);
 		}
 		return defaultValue;
@@ -158,8 +158,8 @@ public class ArgumentParser {
 	 *         cannot be returned as an integer
 	 */
 	public int getValue(String flag, int defaultValue) {
-		if(hasValue(flag)){
-			try{
+		if (hasValue(flag)) {
+			try {
 				return Integer.parseInt(argumentMap.get(flag));
 			} catch (NumberFormatException e) {
 				return defaultValue;

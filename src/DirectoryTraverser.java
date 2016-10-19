@@ -11,8 +11,8 @@ import java.util.List;
  * within directory
  */
 public class DirectoryTraverser {
-	
-	public static List<String> traverse(String path){
+
+	public static List<String> traverse(String path) {
 		ArrayList<String> fileLocations = new ArrayList<>();
 		traverse(Paths.get(path), fileLocations);
 		return fileLocations;
@@ -23,6 +23,8 @@ public class DirectoryTraverser {
 	 * 
 	 * @param path
 	 *            directory/file location passed through from constructor
+	 * @param fileLocations
+	 *            list to save file locations to
 	 */
 	private static void traverse(Path path, List<String> fileLocations) {
 
@@ -39,8 +41,7 @@ public class DirectoryTraverser {
 				}
 			}
 		} catch (IOException e) {
-//			TODO Print out something nicer
-			e.printStackTrace();
+			System.out.println("Input File not found: Please check that the input file is correct!");
 		}
 	}
 }

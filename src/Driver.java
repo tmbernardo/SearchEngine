@@ -1,12 +1,14 @@
 import java.util.List;
 
-// TODO Use the Eclipse Code Indenter (configure Eclipse to do this on save)
-// TODO Add Javadoc to *every* class and method (some members if useful)
-// PROJECT 2  s
-
+/**
+ * Driver
+ * 
+ * Parses the command line input for flags, creates an inverted index of files,
+ * searches for strings, and writes data to the respective JSON file
+ */
 public class Driver {
 
-	public static void main(String[] args){
+	public static void main(String[] args) {
 
 		String dir = "-dir";
 		String index = "-index";

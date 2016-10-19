@@ -7,11 +7,20 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class QueryParser {
-	// Parse the query file into lines and lines into either
-	// an array or list of sorted cleaned words
+/**
+ * Parses the queries given in an input file
+ */
 
-	public static ArrayList<String> parseQuery(String inputFile){
+public class QueryParser {
+	/**
+	 * Goes through search terms in an input file line by line and cleans and
+	 * adds each word to a list
+	 * 
+	 * @param inputFile
+	 *            file to parse search terms from
+	 * @return List of search terms to look for in the index file
+	 */
+	public static ArrayList<String> parseQuery(String inputFile) {
 		ArrayList<String> queryList = new ArrayList<String>();
 
 		try (BufferedReader reader = Files.newBufferedReader(Paths.get(inputFile), Charset.forName("UTF-8"));) {
@@ -26,7 +35,7 @@ public class QueryParser {
 				}
 			}
 		} catch (Exception e) {
-			System.out.println("File error");
+			System.out.println("QueryParser: File could not be opened!");
 		}
 
 		Collections.sort(queryList);

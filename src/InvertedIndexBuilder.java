@@ -3,9 +3,22 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+/**
+ * Builds an inverted index from the files passed through to parseWords
+ */
 public class InvertedIndexBuilder {
-	
-	public static void parseWords(Path inputFile, InvertedIndex index){
+	/**
+	 * Goes through all words in each sub-directory/file passed and adds it to
+	 * the inverted index passed
+	 * 
+	 * @param inputFile
+	 *            location of the directory to be parsed
+	 * @param index
+	 *            inverted index to add words to
+	 * 
+	 */
+	public static void parseWords(Path inputFile, InvertedIndex index) {
 		int lineNumber = 0;
 
 		try (BufferedReader reader = Files.newBufferedReader(inputFile, Charset.forName("UTF-8"));) {
@@ -21,10 +34,8 @@ public class InvertedIndexBuilder {
 			}
 
 		} catch (IOException e) {
-//			TODO Print out something nicer
-			e.printStackTrace();
+			System.out.println("InvertedIndexBuilder: File is invalid!");
 		}
 	}
-	
 
 }
