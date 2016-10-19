@@ -16,7 +16,7 @@ public class InvertedIndex {
 	 * queries are found
 	 */
 	private final TreeMap<String, TreeMap<String, TreeSet<Integer>>> words;
-	private final TreeMap<String, ArrayList<SearchQuery>> SearchQueries;
+	private final TreeMap<String, ArrayList<SearchQuery>> SearchQueries; // TODO In a separate class dedicated to dealing with the query file
 
 	/**
 	 * Default Constructor
@@ -51,7 +51,7 @@ public class InvertedIndex {
 	 * @param inputFile
 	 *            Location of file containing queries to be searched
 	 */
-	public void exactSearch(String inputFile) {
+	public void exactSearch(String inputFile) { // TODO Keep here, return search results List<SearchQuery>, take in already split lines
 
 		List<String> queryList = QueryParser.parseQuery(inputFile);
 
@@ -83,7 +83,7 @@ public class InvertedIndex {
 							SearchQueries.get(SearchQuery).add(newQuery);
 						}
 					}
-					Collections.sort(SearchQueries.get(SearchQuery));
+					Collections.sort(SearchQueries.get(SearchQuery)); // TODO Fix the sort order?
 					Collections.reverse(SearchQueries.get(SearchQuery));
 				}
 			}
