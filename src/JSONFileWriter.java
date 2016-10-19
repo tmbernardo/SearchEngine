@@ -84,6 +84,7 @@ public class JSONFileWriter {
 	 *            TreeMap containing results of search
 	 */
 	public static void SearchResultsToJSON(Path outputFile, TreeMap<String, ArrayList<SearchQuery>> SearchQueries) {
+		// TODO Files.newBufferedWriter(outputFile, Charset.forName("UTF8"));
 		try (BufferedWriter writer = writerCreator(outputFile)) {
 
 			writer.write("{" + END);

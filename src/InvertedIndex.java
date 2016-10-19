@@ -168,7 +168,7 @@ public class InvertedIndex {
 	 * @param outputFile
 	 *            name of the JSON file to be written to
 	 */
-	public void IndexToJSON(String outputFile) {
+	public void IndexToJSON(String outputFile) { // TODO toJSON()
 		JSONFileWriter.IndexToJSON(Paths.get(outputFile), words);
 	}
 
