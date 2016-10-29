@@ -23,9 +23,10 @@ public class InvertedIndexBuilder {
 
 		try (BufferedReader reader = Files.newBufferedReader(inputFile, Charset.forName("UTF-8"));) {
 			String line = null;
+			// TODO String path = inputFile.toString(); outside the while loop
 
 			while ((line = reader.readLine()) != null) {
-				for (String word : line.trim().replaceAll("\\p{Punct}+", "").split(" +")) {
+				for (String word : line.trim().replaceAll("\\p{Punct}+", "").split(" +")) { // TODO split("\\s+")
 					if (!word.isEmpty()) {
 						lineNumber++;
 						index.add(word.trim().toLowerCase(), lineNumber, inputFile.toString());

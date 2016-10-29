@@ -12,6 +12,11 @@ import java.util.List;
  */
 public class DirectoryTraverser {
 
+	/**
+	 * TODO
+	 * @param path
+	 * @return
+	 */
 	public static List<String> traverse(String path) {
 		ArrayList<String> fileLocations = new ArrayList<>();
 		traverse(Paths.get(path), fileLocations);

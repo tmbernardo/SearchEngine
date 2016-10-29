@@ -21,6 +21,24 @@ public class Driver {
 
 		ArgumentParser argParser = new ArgumentParser();
 		argParser.parseArguments(args);
+		
+		/*
+		 * InvertedIndex index = new InvertedIndex();
+		 * 
+		 * if (hasFlag(-dir) {
+		 *    build stuff only
+		 * }
+		 * 
+		 * if (query flag) {
+		 *    search
+		 * }
+		 * 
+		 * if (output index) {
+		 *    output index
+		 * }
+		 * 
+		 * 
+		 */
 
 		if (argParser.hasFlag(dir) && argParser.hasValue(dir)) {
 			List<String> fileLocations = DirectoryTraverser.traverse(argParser.getValue(dir));
