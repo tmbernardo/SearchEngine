@@ -207,32 +207,4 @@ public class HTTPFetcher {
 
 		return parseHeaders(lines);
 	}
-
-	public static void main(String[] args) throws Exception {
-		String url = "http://www.cs.usfca.edu/~sjengle/archived.html";
-		System.out.println("***** HEADERS *****");
-		System.out.println(fetchHeaders(url));
-		System.out.println();
-
-		System.out.println("***** FIELDS *****");
-		System.out.println(getHeaderFields(url));
-		System.out.println();
-
-		System.out.println("***** HEADERS and HTML *****");
-		System.out.println(fetchAll(url));
-		System.out.println();
-
-		System.out.println("***** HTML *****");
-		System.out.println(fetchHTML(url));
-		System.out.println();
-
-		String image = "http://www.cs.usfca.edu/~sjengle/images/olivetrees.jpg";
-
-		System.out.println("**** IMAGE HEADERS *****");
-		System.out.println(fetchHeaders(image));
-		System.out.println();
-
-		System.out.println("**** IMAGE HTML *****");
-		System.out.println(fetchHTML(image));
-	}
 }

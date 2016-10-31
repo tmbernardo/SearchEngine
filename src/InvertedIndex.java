@@ -47,21 +47,21 @@ public class InvertedIndex {
 	 */
 	public void InvertedIndexDir(List<String> fileLocations) {
 		for (String string : fileLocations) {
-			InvertedIndexBuilder.parseWords(Paths.get(string), this);
+			InvertedIndexBuilder.parseWordsDir(Paths.get(string), this);
 		}
 	}
 
 	/**
-	 * Takes in an ArrayList containing the file locations TODO: create URL
+	 * Takes in an ArrayList containing the URLs TODO: create URL
 	 * invertedindex
 	 * 
-	 * @param fileLocations
+	 * @param urls
 	 *            ArrayList of file locations
 	 */
-	public void InvertedIndexURL(List<String> fileLocations) {
+	public void InvertedIndexURL(List<String> urls) {
 
-		for (String string : fileLocations) {
-			InvertedIndexBuilder.parseWords(Paths.get(string), this);
+		for (String url : urls) {
+			InvertedIndexBuilder.parseWordsUrl(url, this);
 		}
 	}
 

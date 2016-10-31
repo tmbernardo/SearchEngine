@@ -25,18 +25,6 @@ public class DirectoryTraverser {
 	}
 
 	/**
-	 * TODO traverse a given URL and return a queue of URLs in list
-	 * 
-	 * @param path
-	 * @return
-	 */
-	public static List<String> traverseURL(String path) {
-		ArrayList<String> fileLocations = new ArrayList<>();
-		traverse(Paths.get(path), fileLocations);
-		return fileLocations;
-	}
-
-	/**
 	 * Traverses directory recursively and saves the text files
 	 * 
 	 * @param path

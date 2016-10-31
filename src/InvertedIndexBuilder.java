@@ -18,7 +18,7 @@ public class InvertedIndexBuilder {
 	 *            inverted index to add words to
 	 * 
 	 */
-	public static void parseWords(Path inputFile, InvertedIndex index) {
+	public static void parseWordsDir(Path inputFile, InvertedIndex index) {
 		int lineNumber = 0;
 
 		try (BufferedReader reader = Files.newBufferedReader(inputFile, Charset.forName("UTF-8"));) {
@@ -26,8 +26,7 @@ public class InvertedIndexBuilder {
 			// TODO String path = inputFile.toString(); outside the while loop
 
 			while ((line = reader.readLine()) != null) {
-				for (String word : line.trim().replaceAll("\\p{Punct}+", "").split(" +")) { // TODO
-																							// split("\\s+")
+				for (String word : line.trim().replaceAll("\\p{Punct}+", "").split("\\s+")) {
 					if (!word.isEmpty()) {
 						lineNumber++;
 						index.add(word.trim().toLowerCase(), lineNumber, inputFile.toString());
@@ -41,5 +40,31 @@ public class InvertedIndexBuilder {
 	}
 
 	// TODO parseWords from URLS
+	
+	public static void parseWordsUrl(String url, InvertedIndex index){
+		String html = HTMLCleaner.fetchHTML(url);
+		html = HTMLCleaner.cleanHTML(html);
+		
+		int lineNumber = 0;
+		
+		for (String lines : html.split("\n+")) {
+			
+			System.out.println(lines);
+			
+			if (!lines.trim().isEmpty()){
+				lineNumber++;
+				
+				for (String word : lines.trim().replaceAll("\\p{Punct}+", "").split("\\s+")) {
+					
+					word = word.trim().toLowerCase();
+					
+					if(!word.isEmpty()){
+						index.add(word, lineNumber, url);
+					}
+				
+				}
+			}
+		}
+	}
 
 }

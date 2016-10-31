@@ -25,17 +25,14 @@ public class Driver {
 		ArgumentParser argParser = new ArgumentParser();
 		argParser.parseArguments(args);
 
-		if (argParser.hasFlag(dir_flag) && argParser.hasValue(dir_flag)) {
+		if (argParser.hasValue(dir_flag)) {
 			List<String> fileLocations = DirectoryTraverser.traverse(argParser.getValue(dir_flag));
 			index.InvertedIndexDir(fileLocations);
 		}
 
-		if (argParser.hasFlag(url_flag)) {
+		if (argParser.hasValue(url_flag) ) {
 			List<String> urls = WebCrawler.getURLs(argParser.getValue(url_flag));
-
-			for (String string : urls) {
-				System.out.println(string);
-			}
+			index.InvertedIndexURL(urls);
 		}
 
 		if (argParser.hasValue(exact_flag)) {
