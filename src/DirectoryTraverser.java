@@ -14,10 +14,23 @@ public class DirectoryTraverser {
 
 	/**
 	 * TODO
+	 * 
 	 * @param path
 	 * @return
 	 */
 	public static List<String> traverse(String path) {
+		ArrayList<String> fileLocations = new ArrayList<>();
+		traverse(Paths.get(path), fileLocations);
+		return fileLocations;
+	}
+
+	/**
+	 * TODO traverse a given URL and return a queue of URLs in list
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public static List<String> traverseURL(String path) {
 		ArrayList<String> fileLocations = new ArrayList<>();
 		traverse(Paths.get(path), fileLocations);
 		return fileLocations;

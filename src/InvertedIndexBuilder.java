@@ -26,7 +26,8 @@ public class InvertedIndexBuilder {
 			// TODO String path = inputFile.toString(); outside the while loop
 
 			while ((line = reader.readLine()) != null) {
-				for (String word : line.trim().replaceAll("\\p{Punct}+", "").split(" +")) { // TODO split("\\s+")
+				for (String word : line.trim().replaceAll("\\p{Punct}+", "").split(" +")) { // TODO
+																							// split("\\s+")
 					if (!word.isEmpty()) {
 						lineNumber++;
 						index.add(word.trim().toLowerCase(), lineNumber, inputFile.toString());
@@ -38,5 +39,7 @@ public class InvertedIndexBuilder {
 			System.out.println("InvertedIndexBuilder: File is invalid!");
 		}
 	}
+
+	// TODO parseWords from URLS
 
 }

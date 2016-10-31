@@ -16,7 +16,18 @@ public class InvertedIndex {
 	 * queries are found
 	 */
 	private final TreeMap<String, TreeMap<String, TreeSet<Integer>>> words;
-	private final TreeMap<String, ArrayList<SearchQuery>> SearchQueries; // TODO In a separate class dedicated to dealing with the query file
+	private final TreeMap<String, ArrayList<SearchQuery>> SearchQueries; // TODO
+																			// In
+																			// a
+																			// separate
+																			// class
+																			// dedicated
+																			// to
+																			// dealing
+																			// with
+																			// the
+																			// query
+																			// file
 
 	/**
 	 * Default Constructor
@@ -29,14 +40,25 @@ public class InvertedIndex {
 	}
 
 	/**
-	 * Constructor: takes in an ArrayList containing the file locations
+	 * Takes in an ArrayList containing the file locations
 	 * 
 	 * @param fileLocations
 	 *            ArrayList of file locations
 	 */
-	public InvertedIndex(List<String> fileLocations) {
+	public void InvertedIndexDir(List<String> fileLocations) {
+		for (String string : fileLocations) {
+			InvertedIndexBuilder.parseWords(Paths.get(string), this);
+		}
+	}
 
-		this();
+	/**
+	 * Takes in an ArrayList containing the file locations TODO: create URL
+	 * invertedindex
+	 * 
+	 * @param fileLocations
+	 *            ArrayList of file locations
+	 */
+	public void InvertedIndexURL(List<String> fileLocations) {
 
 		for (String string : fileLocations) {
 			InvertedIndexBuilder.parseWords(Paths.get(string), this);
@@ -51,7 +73,9 @@ public class InvertedIndex {
 	 * @param inputFile
 	 *            Location of file containing queries to be searched
 	 */
-	public void exactSearch(String inputFile) { // TODO Keep here, return search results List<SearchQuery>, take in already split lines
+	public void exactSearch(String inputFile) { // TODO Keep here, return search
+												// results List<SearchQuery>,
+												// take in already split lines
 
 		List<String> queryList = QueryParser.parseQuery(inputFile);
 
@@ -83,7 +107,11 @@ public class InvertedIndex {
 							SearchQueries.get(SearchQuery).add(newQuery);
 						}
 					}
-					Collections.sort(SearchQueries.get(SearchQuery)); // TODO Fix the sort order?
+					Collections.sort(SearchQueries.get(SearchQuery)); // TODO
+																		// Fix
+																		// the
+																		// sort
+																		// order?
 					Collections.reverse(SearchQueries.get(SearchQuery));
 				}
 			}
