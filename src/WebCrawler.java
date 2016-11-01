@@ -10,27 +10,27 @@ import java.util.List;
 import java.util.Queue;
 
 public class WebCrawler {
-	
+
 	private final static int MAXLINKS = 50;
-	
+
 	private static URL base;
 
 	public static List<String> getURLs(String inputURL) {
-		
+
 		System.out.println("Crawling Link: " + inputURL);
 		List<String> urls = new ArrayList<String>();
 		Queue<String> urlQueue = new LinkedList<String>();
-		
 
 		urlQueue.add(inputURL);
 
-		while (urls.size() < MAXLINKS && !urlQueue.isEmpty()) {
+		while (urlQueue.size() < MAXLINKS && urls.size() < MAXLINKS && urlQueue.size() > 0) {
 
 			try {
-				base = new URL(inputURL);
-				String newURL = normalize(urlQueue.remove());
-				urls.add(newURL);
-				addLinks(newURL, urlQueue);
+				base = new URL(urlQueue.remove());
+
+				urls.add(base.toString());
+
+				addToQueue(base.toString(), urlQueue);
 
 			} catch (MalformedURLException e) {
 				// TODO Auto-generated catch block
@@ -47,34 +47,43 @@ public class WebCrawler {
 			}
 		}
 
+		while (urls.size() < MAXLINKS && urlQueue.size() > 0) {
+			urls.add(urlQueue.remove());
+		}
+
 		return urls;
 	}
 
-	private static void addLinks(String url, Queue<String> urls)
+	private static void addToQueue(String url, Queue<String> urlQueue)
 			throws URISyntaxException, UnknownHostException, IOException {
 
 		String html = null;
 
 		html = HTTPFetcher.fetchHTML(url);
 
-		for (String link : LinkParser.listLinks(html)) {
-			link = normalize(link);
+		ArrayList<String> linklist = LinkParser.listLinks(html);
 
-			if (!urls.contains(link) && urls.size() < 50) {
-				urls.add(link);
+		if (linklist.size() > 0) {
+			for (String link : linklist) {
+
+				link = normalize(link);
+
+				if (!urlQueue.contains(link)) {
+					urlQueue.add(link);
+				}
 			}
 		}
 	}
 
 	private static String normalize(String link) throws MalformedURLException, URISyntaxException {
 		URI newURL;
-		
-		if (!link.contains("www")){
-			newURL = new URL(base, "../"+ link).toURI();
+
+		if (!link.contains("http://")) {
+			newURL = new URL(base, "./" + link).toURI();
+		} else {
+			newURL = new URI(link);
 		}
 
-		newURL = new URI(link).normalize();
-
-		return newURL.toString();
+		return newURL.normalize().toString();
 	}
 }

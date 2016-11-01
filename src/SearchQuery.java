@@ -48,9 +48,10 @@ public class SearchQuery implements Comparable<SearchQuery> {
 		this.index = index;
 	}
 
-	// TODO updateCount(int count) that adds, and an updateIndex() that updates only if less than
+	// TODO updateCount(int count) that adds, and an updateIndex() that updates
+	// only if less than
 	// TODO update(int count, int index) that does both
-	
+
 	/**
 	 * Ranks the data from this file to another using the following criteria:
 	 * 
@@ -71,7 +72,7 @@ public class SearchQuery implements Comparable<SearchQuery> {
 			if (result == 0) {
 				String file1 = Paths.get(this.where).normalize().toString();
 				String file2 = Paths.get(compareQuery.getWhere()).normalize().toString();
-				return file2.compareToIgnoreCase(file1);
+				return file2.compareTo(file1);
 			}
 		}
 

@@ -30,7 +30,7 @@ public class Driver {
 			index.InvertedIndexDir(fileLocations);
 		}
 
-		if (argParser.hasValue(url_flag) ) {
+		if (argParser.hasValue(url_flag)) {
 			List<String> urls = WebCrawler.getURLs(argParser.getValue(url_flag));
 			index.InvertedIndexURL(urls);
 		}

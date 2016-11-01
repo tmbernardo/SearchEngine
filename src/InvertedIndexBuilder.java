@@ -1,5 +1,6 @@
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,29 +41,27 @@ public class InvertedIndexBuilder {
 	}
 
 	// TODO parseWords from URLS
-	
-	public static void parseWordsUrl(String url, InvertedIndex index){
-		String html = HTMLCleaner.fetchHTML(url);
-		html = HTMLCleaner.cleanHTML(html);
-		
+
+	public static void parseWordsUrl(String url, InvertedIndex index) {
+		String[] html = null;
+		try {
+			html = HTMLCleaner.fetchWords(url);
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		int lineNumber = 0;
-		
-		for (String lines : html.split("\n+")) {
-			
-			System.out.println(lines);
-			
-			if (!lines.trim().isEmpty()){
-				lineNumber++;
-				
-				for (String word : lines.trim().replaceAll("\\p{Punct}+", "").split("\\s+")) {
-					
-					word = word.trim().toLowerCase();
-					
-					if(!word.isEmpty()){
-						index.add(word, lineNumber, url);
-					}
-				
-				}
+
+		for (String word : html) {
+
+			lineNumber++;
+
+			if (!word.isEmpty()) {
+				index.add(word, lineNumber, url);
 			}
 		}
 	}

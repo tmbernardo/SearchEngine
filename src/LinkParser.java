@@ -18,7 +18,7 @@ public class LinkParser {
 	/**
 	 * The regular expression used to parse the HTML for links.
 	 */
-	public static final String REGEX = "(?i)(?:<a\\s+?.*?\\s?href\\s?.*?\\s?.*?\")((http://)?\\w+\\..*?)(?:\")";
+	public static final String REGEX = "(?i)(?:<a\\s+?.*?\\s?href\\s?.*?\\s?.*?\")((http://)?\\w+.*?\\.\\w+?)(?:\")";
 
 	/**
 	 * The group in the regular expression that captures the raw link.
