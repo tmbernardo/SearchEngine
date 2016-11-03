@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+// TODO Capitalize variables and methods appropriately
+
 /**
  * This class stores a word, file path, and location into a triply nested
  * collection (words) structure.
@@ -16,6 +18,9 @@ public class InvertedIndex {
 	 * queries are found
 	 */
 	private final TreeMap<String, TreeMap<String, TreeSet<Integer>>> words;
+	
+	// TODO If this were a search engine, you would run out of space 	quick
+	// TODO Move this to QueryParser
 	private final TreeMap<String, ArrayList<SearchQuery>> SearchQueries; // TODO
 																			// In
 																			// a
@@ -45,7 +50,7 @@ public class InvertedIndex {
 	 * @param fileLocations
 	 *            ArrayList of file locations
 	 */
-	public void InvertedIndexDir(List<String> fileLocations) {
+	public void InvertedIndexDir(List<String> fileLocations) { // TODO Capitalization
 		for (String string : fileLocations) {
 			InvertedIndexBuilder.parseWordsDir(Paths.get(string), this);
 		}
@@ -57,13 +62,14 @@ public class InvertedIndex {
 	 * @param urls
 	 *            ArrayList of file locations
 	 */
-	public void InvertedIndexURL(List<String> urls) {
+	public void InvertedIndexURL(List<String> urls) { // TODO Capitalization
 
 		for (String url : urls) {
 			InvertedIndexBuilder.parseWordsUrl(url, this);
 		}
 	}
 
+	// TODO Return the results
 	/**
 	 * This method takes in an input file of search queries and checks if the
 	 * inverted index contains the exact search term. The locations are then
@@ -79,9 +85,11 @@ public class InvertedIndex {
 		List<String> queryList = QueryParser.parseQuery(inputFile);
 
 		for (String SearchQuery : queryList) {
-
+			// TODO THis happens in the QueryParser class
 			SearchQueries.put(SearchQuery, new ArrayList<>());
 
+			// TODO The split will also happen in the QueryParser class
+			// TODO This inner part stays here, the rest moves to QueryParser
 			for (String string : SearchQuery.split(" ")) {
 
 				if (words.containsKey(string)) {
@@ -92,6 +100,7 @@ public class InvertedIndex {
 						newQuery.setCount(words.get(string).get(filematch).size());
 						newQuery.setIndex(words.get(string).get(filematch).first());
 
+						// TODO Doing multiple linear searches to find your result object
 						if (SearchQueries.get(SearchQuery).contains(newQuery)) {
 
 							int index = SearchQueries.get(SearchQuery).indexOf(newQuery);
@@ -111,6 +120,28 @@ public class InvertedIndex {
 			}
 		}
 	}
+	
+	/*
+	 * TODO
+	 * 
+	 * List<SearchQuery> list = ???
+	 * Map<String (location), SearchQuery> map = ???
+	 * 
+	 * for every query word
+	 * 		if query matches a key
+	 * 			for every location 
+	 * 				int count = ???
+	 * 				int index = ???
+	 * 
+	 * 				is this location in our map? 
+	 * 				if yes... update the existing result object
+	 * 				if no... add a new result object to the map AND the list
+	 * 
+	 * Collections.sort(list);
+	 * return list;
+	 * 
+	 * 
+	 */
 
 	/**
 	 * This method takes in an input file of search queries and checks if words
@@ -129,6 +160,7 @@ public class InvertedIndex {
 
 			for (String string : SearchQuery.split(" ")) {
 
+				// TODO We can tighten this loop... https://github.com/usf-cs212-2016/lectures/blob/master/Data%20Structures/src/FindDemo.java#L146
 				for (String word : words.keySet()) {
 
 					if (word.startsWith(string)) {
