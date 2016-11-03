@@ -1,9 +1,7 @@
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,7 +51,7 @@ public class JSONFileWriter {
 	 *            TreeMap containing inverted index
 	 */
 	public static void IndexToJSON(Path outputFile, TreeMap<String, TreeMap<String, TreeSet<Integer>>> words) {
-		try (BufferedWriter writer = writerCreator(outputFile)) {
+		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.forName("UTF8"));) {
 
 			writer.write("{" + END);
 
@@ -84,8 +82,8 @@ public class JSONFileWriter {
 	 *            TreeMap containing results of search
 	 */
 	public static void SearchResultsToJSON(Path outputFile, TreeMap<String, ArrayList<SearchQuery>> SearchQueries) {
-		// TODO Files.newBufferedWriter(outputFile, Charset.forName("UTF8"));
-		try (BufferedWriter writer = writerCreator(outputFile)) {
+
+		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.forName("UTF8"));) {
 
 			writer.write("{" + END);
 
@@ -193,20 +191,5 @@ public class JSONFileWriter {
 			}
 		}
 		writer.write(tab(tabN - 1) + "]");
-	}
-
-	/**
-	 * Writes the line numbers that a certain word appears in a certain file
-	 * 
-	 * @param path
-	 *            file to write to
-	 * @throws FileNotFoundException
-	 * @throws UnsupportedEncodingException
-	 */
-	public static BufferedWriter writerCreator(Path path) throws UnsupportedEncodingException, FileNotFoundException {
-
-		BufferedWriter writer = new BufferedWriter(
-				new OutputStreamWriter(new FileOutputStream(path.toFile()), "UTF-8"));
-		return writer;
 	}
 }

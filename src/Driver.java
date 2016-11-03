@@ -46,7 +46,7 @@ public class Driver {
 		}
 
 		if (argParser.hasFlag(index_flag)) {
-			index.IndexToJSON(argParser.getValue(index_flag, jsonFileName));
+			index.toJSON(argParser.getValue(index_flag, jsonFileName));
 		}
 	}
 }

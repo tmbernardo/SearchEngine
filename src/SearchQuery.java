@@ -63,6 +63,7 @@ public class SearchQuery implements Comparable<SearchQuery> {
 	 */
 	@Override
 	public int compareTo(SearchQuery compareQuery) {
+		// tried making both - but still didn't come out correct
 
 		int result = Integer.compare(this.count, compareQuery.count);
 
@@ -72,11 +73,10 @@ public class SearchQuery implements Comparable<SearchQuery> {
 			if (result == 0) {
 				String file1 = Paths.get(this.where).normalize().toString();
 				String file2 = Paths.get(compareQuery.getWhere()).normalize().toString();
-				return file2.compareTo(file1);
+				return -file2.compareTo(file1);
 			}
 		}
-
-		return result;
+		return -result;
 	}
 
 	/**

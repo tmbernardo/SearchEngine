@@ -27,7 +27,7 @@ import java.util.Map;
  * @see HTMLCleanerTest
  */
 public class HTMLCleaner {
-	// --------------------------------------------------------------------------------
+	/** Port used by socket. For web servers, should be port 80. */
 	public static final int DEFAULT_PORT = 80;
 
 	/** Version of HTTP used and supported. */
@@ -39,7 +39,21 @@ public class HTMLCleaner {
 		OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
 	};
 
-	// --------------------------------------------------------------------------------
+	/**
+	 * Will connect to the web server and fetch the URL using the HTTP request
+	 * provided. It would be more efficient to operate on each line as returned
+	 * instead of storing the entire result as a list.
+	 *
+	 * @param url
+	 *            - url to fetch
+	 * @param request
+	 *            - full HTTP request
+	 *
+	 * @return the lines read from the web server
+	 *
+	 * @throws IOException
+	 * @throws UnknownHostException
+	 */
 	public static List<String> fetchLines(URL url, String request) throws UnknownHostException, IOException {
 		ArrayList<String> lines = new ArrayList<>();
 		int port = url.getPort() < 0 ? DEFAULT_PORT : url.getPort();
@@ -59,8 +73,19 @@ public class HTMLCleaner {
 
 		return lines;
 	}
-	// --------------------------------------------------------------------------------
 
+	/**
+	 * Crafts a minimal HTTP/1.1 request for the provided method.
+	 *
+	 * @param url
+	 *            - url to fetch
+	 * @param type
+	 *            - HTTP method to use
+	 *
+	 * @return HTTP/1.1 request
+	 *
+	 * @see {@link HTTP}
+	 */
 	public static String craftHTTPRequest(URL url, HTTP type) {
 		String host = url.getHost();
 		String resource = url.getFile().isEmpty() ? "/" : url.getFile();
@@ -71,7 +96,16 @@ public class HTMLCleaner {
 				version, host);
 	}
 
-	// --------------------------------------------------------------------------------
+	/**
+	 * Helper method that parses HTTP headers into a map where the key is the
+	 * field name and the value is the field value. The status code will be
+	 * stored under the key "Status".
+	 *
+	 * @param headers
+	 *            - HTTP/1.1 header lines
+	 * @return field names mapped to values if the headers are properly
+	 *         formatted
+	 */
 	public static Map<String, String> parseHeaders(List<String> headers) {
 		Map<String, String> fields = new HashMap<>();
 
@@ -89,7 +123,6 @@ public class HTMLCleaner {
 
 		return fields;
 	}
-	// --------------------------------------------------------------------------------
 
 	/** Regular expression for removing special characters. */
 	public static final String CLEAN_REGEX = "(?U)[^\\p{Alnum}\\p{Space}]+";

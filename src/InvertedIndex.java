@@ -52,8 +52,7 @@ public class InvertedIndex {
 	}
 
 	/**
-	 * Takes in an ArrayList containing the URLs TODO: create URL
-	 * invertedindex
+	 * Takes in an ArrayList containing the URLs
 	 * 
 	 * @param urls
 	 *            ArrayList of file locations
@@ -107,12 +106,7 @@ public class InvertedIndex {
 							SearchQueries.get(SearchQuery).add(newQuery);
 						}
 					}
-					Collections.sort(SearchQueries.get(SearchQuery)); // TODO
-																		// Fix
-																		// the
-																		// sort
-																		// order?
-					Collections.reverse(SearchQueries.get(SearchQuery));
+					Collections.sort(SearchQueries.get(SearchQuery));
 				}
 			}
 		}
@@ -159,7 +153,6 @@ public class InvertedIndex {
 							}
 						}
 						Collections.sort(SearchQueries.get(SearchQuery));
-						Collections.reverse(SearchQueries.get(SearchQuery));
 					}
 				}
 			}
@@ -185,7 +178,6 @@ public class InvertedIndex {
 		if (!words.get(word).containsKey(fileName)) {
 			words.get(word).put(fileName, new TreeSet<>());
 		}
-
 		words.get(word).get(fileName).add(lineNumber);
 	}
 
@@ -196,7 +188,7 @@ public class InvertedIndex {
 	 * @param outputFile
 	 *            name of the JSON file to be written to
 	 */
-	public void IndexToJSON(String outputFile) { // TODO toJSON()
+	public void toJSON(String outputFile) {
 		JSONFileWriter.IndexToJSON(Paths.get(outputFile), words);
 	}
 

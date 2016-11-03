@@ -24,13 +24,13 @@ public class InvertedIndexBuilder {
 
 		try (BufferedReader reader = Files.newBufferedReader(inputFile, Charset.forName("UTF-8"));) {
 			String line = null;
-			// TODO String path = inputFile.toString(); outside the while loop
+			String path = inputFile.toString();
 
 			while ((line = reader.readLine()) != null) {
 				for (String word : line.trim().replaceAll("\\p{Punct}+", "").split("\\s+")) {
 					if (!word.isEmpty()) {
 						lineNumber++;
-						index.add(word.trim().toLowerCase(), lineNumber, inputFile.toString());
+						index.add(word.trim().toLowerCase(), lineNumber, path);
 					}
 				}
 			}
@@ -40,18 +40,14 @@ public class InvertedIndexBuilder {
 		}
 	}
 
-	// TODO parseWords from URLS
-
 	public static void parseWordsUrl(String url, InvertedIndex index) {
 		String[] html = null;
 		try {
 			html = HTMLCleaner.fetchWords(url);
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("parseWordsUrl: Host could not be determined!");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("pareWordsUrl: IOException from fetchWords");
 		}
 
 		int lineNumber = 0;

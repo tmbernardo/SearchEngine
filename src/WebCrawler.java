@@ -9,15 +9,26 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+/**
+ * 
+ */
 public class WebCrawler {
 
 	private final static int MAXLINKS = 50;
 
 	private static URL base;
 
+	/**
+	 * Runs through a URL parsing all of the links within and saves them to a
+	 * queue
+	 * 
+	 * @param inputURL
+	 *            Origin URL to parse links through
+	 * 
+	 * @return urls list of URLs that have been found from originating link
+	 */
 	public static List<String> getURLs(String inputURL) {
 
-		System.out.println("Crawling Link: " + inputURL);
 		List<String> urls = new ArrayList<String>();
 		Queue<String> urlQueue = new LinkedList<String>();
 
@@ -33,33 +44,39 @@ public class WebCrawler {
 				addToQueue(base.toString(), urlQueue);
 
 			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				System.out.println("getURLs: String could not be formatted to a URL");
 			} catch (UnknownHostException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				System.out.println("getURLs: Host is unknown");
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				System.out.println("getURLs: file IOException");
+			} catch (URISyntaxException e) {
+				System.out.println("getURLs: URISyntaxException");
 			}
 		}
 
-		while (urls.size() < MAXLINKS && urlQueue.size() > 0) {
+		while (urls.size() < MAXLINKS && urlQueue.size() > 0)
+
+		{
 			urls.add(urlQueue.remove());
 		}
 
 		return urls;
 	}
 
+	/**
+	 * Adds link from a given URL to the queue if there are < 50 elements
+	 * 
+	 * @param url
+	 *            string of url to be cleaned and made absolute
+	 * @param urlQueue
+	 *            Queue of URLs to go through if length is < 50
+	 */
 	private static void addToQueue(String url, Queue<String> urlQueue)
-			throws URISyntaxException, UnknownHostException, IOException {
+			throws UnknownHostException, IOException, URISyntaxException {
 
 		String html = null;
 
-		html = HTTPFetcher.fetchHTML(url);
+		html = HTMLCleaner.fetchHTML(url);
 
 		ArrayList<String> linklist = LinkParser.listLinks(html);
 
@@ -75,6 +92,13 @@ public class WebCrawler {
 		}
 	}
 
+	/**
+	 * Takes the URL and turns it into absolute then normalizes
+	 * 
+	 * @param link
+	 * 
+	 * @return normalized absolute URL returned as a string
+	 */
 	private static String normalize(String link) throws MalformedURLException, URISyntaxException {
 		URI newURL;
 

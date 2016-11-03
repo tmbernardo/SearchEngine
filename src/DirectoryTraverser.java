@@ -13,10 +13,12 @@ import java.util.List;
 public class DirectoryTraverser {
 
 	/**
-	 * TODO
+	 * Calls overridden traverse function so that file paths are stored in
+	 * fileLocations
 	 * 
 	 * @param path
-	 * @return
+	 *            directory/file location passed through from constructor
+	 * @return List<String> list of text file locations
 	 */
 	public static List<String> traverse(String path) {
 		ArrayList<String> fileLocations = new ArrayList<>();
