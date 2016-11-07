@@ -48,9 +48,20 @@ public class SearchQuery implements Comparable<SearchQuery> {
 		this.index = index;
 	}
 
-	// TODO updateCount(int count) that adds, and an updateIndex() that updates
-	// only if less than
-	// TODO update(int count, int index) that does both
+	public void updateCount(int count) {
+		this.count += count;
+	}
+
+	public void updateIndex(int index) {
+		if (this.index > index) {
+			this.index = index;
+		}
+	}
+
+	public void update(int count, int index) {
+		this.updateCount(count);
+		this.updateIndex(index);
+	}
 
 	/**
 	 * Ranks the data from this file to another using the following criteria:

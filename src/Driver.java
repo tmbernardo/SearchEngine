@@ -22,27 +22,29 @@ public class Driver {
 
 		InvertedIndex index = new InvertedIndex();
 
+		QueryParser searcher = new QueryParser(index);
+
 		ArgumentParser argParser = new ArgumentParser();
 		argParser.parseArguments(args);
 
 		if (argParser.hasValue(dir_flag)) {
 			List<String> fileLocations = DirectoryTraverser.traverse(argParser.getValue(dir_flag));
-			index.InvertedIndexDir(fileLocations);
+			index.invertedIndexDir(fileLocations);
 		}
 
 		if (argParser.hasValue(url_flag)) {
 			List<String> urls = WebCrawler.getURLs(argParser.getValue(url_flag));
-			index.InvertedIndexURL(urls);
+			index.invertedIndexUrl(urls);
 		}
 
 		if (argParser.hasValue(exact_flag)) {
-			index.exactSearch(argParser.getValue(exact_flag));
-			index.SearchResultsToJSON(argParser.getValue(results_flag, resultsFileName));
+			searcher.parseQuery(argParser.getValue(exact_flag), true);
+			searcher.toJSON(argParser.getValue(results_flag, resultsFileName));
 		}
 
 		if (argParser.hasValue(query_flag)) {
-			index.partialSearch(argParser.getValue(query_flag));
-			index.SearchResultsToJSON(argParser.getValue(results_flag, resultsFileName));
+			searcher.parseQuery(argParser.getValue(query_flag), false);
+			searcher.toJSON(argParser.getValue(results_flag, resultsFileName));
 		}
 
 		if (argParser.hasFlag(index_flag)) {

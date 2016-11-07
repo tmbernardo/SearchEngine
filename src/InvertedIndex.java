@@ -2,10 +2,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
-// TODO Capitalize variables and methods appropriately
 
 /**
  * This class stores a word, file path, and location into a triply nested
@@ -18,21 +17,6 @@ public class InvertedIndex {
 	 * queries are found
 	 */
 	private final TreeMap<String, TreeMap<String, TreeSet<Integer>>> words;
-	
-	// TODO If this were a search engine, you would run out of space 	quick
-	// TODO Move this to QueryParser
-	private final TreeMap<String, ArrayList<SearchQuery>> SearchQueries; // TODO
-																			// In
-																			// a
-																			// separate
-																			// class
-																			// dedicated
-																			// to
-																			// dealing
-																			// with
-																			// the
-																			// query
-																			// file
 
 	/**
 	 * Default Constructor
@@ -41,7 +25,6 @@ public class InvertedIndex {
 	 */
 	public InvertedIndex() {
 		this.words = new TreeMap<>();
-		this.SearchQueries = new TreeMap<>();
 	}
 
 	/**
@@ -50,7 +33,7 @@ public class InvertedIndex {
 	 * @param fileLocations
 	 *            ArrayList of file locations
 	 */
-	public void InvertedIndexDir(List<String> fileLocations) { // TODO Capitalization
+	public void invertedIndexDir(List<String> fileLocations) {
 		for (String string : fileLocations) {
 			InvertedIndexBuilder.parseWordsDir(Paths.get(string), this);
 		}
@@ -62,133 +45,88 @@ public class InvertedIndex {
 	 * @param urls
 	 *            ArrayList of file locations
 	 */
-	public void InvertedIndexURL(List<String> urls) { // TODO Capitalization
+	public void invertedIndexUrl(List<String> urls) {
 
 		for (String url : urls) {
 			InvertedIndexBuilder.parseWordsUrl(url, this);
 		}
 	}
 
-	// TODO Return the results
 	/**
 	 * This method takes in an input file of search queries and checks if the
 	 * inverted index contains the exact search term. The locations are then
 	 * saved to a SearchQuery object and sorted in a ranked order.
 	 * 
-	 * @param inputFile
-	 *            Location of file containing queries to be searched
+	 * @param queries
+	 *            list of queries to be searched
+	 * @return list of results
 	 */
-	public void exactSearch(String inputFile) { // TODO Keep here, return search
-												// results List<SearchQuery>,
-												// take in already split lines
+	public List<SearchQuery> exactSearch(String[] queries) {
+		List<SearchQuery> results = new ArrayList<>();
 
-		List<String> queryList = QueryParser.parseQuery(inputFile);
+		Map<String, SearchQuery> resultmap = new TreeMap<>();
 
-		for (String SearchQuery : queryList) {
-			// TODO THis happens in the QueryParser class
-			SearchQueries.put(SearchQuery, new ArrayList<>());
+		for (String query : queries) {
+			if (words.containsKey(query)) {
+				for (String location : words.get(query).keySet()) {
+					int count = words.get(query).get(location).size();
+					int index = words.get(query).get(location).first();
 
-			// TODO The split will also happen in the QueryParser class
-			// TODO This inner part stays here, the rest moves to QueryParser
-			for (String string : SearchQuery.split(" ")) {
-
-				if (words.containsKey(string)) {
-
-					for (String filematch : words.get(string).keySet()) {
-
-						SearchQuery newQuery = new SearchQuery(filematch);
-						newQuery.setCount(words.get(string).get(filematch).size());
-						newQuery.setIndex(words.get(string).get(filematch).first());
-
-						// TODO Doing multiple linear searches to find your result object
-						if (SearchQueries.get(SearchQuery).contains(newQuery)) {
-
-							int index = SearchQueries.get(SearchQuery).indexOf(newQuery);
-							SearchQuery similarQuery = SearchQueries.get(SearchQuery).get(index);
-							similarQuery.setCount(similarQuery.getCount() + newQuery.getCount());
-
-							if (newQuery.getIndex() < similarQuery.getIndex()) {
-								similarQuery.setIndex(newQuery.getIndex());
-							}
-
-						} else {
-							SearchQueries.get(SearchQuery).add(newQuery);
-						}
+					if (resultmap.containsKey(location)) {
+						resultmap.get(location).update(count, index);
+					} else {
+						SearchQuery newquery = new SearchQuery(location);
+						newquery.setCount(count);
+						newquery.setIndex(index);
+						resultmap.put(location, newquery);
+						results.add(newquery);
 					}
-					Collections.sort(SearchQueries.get(SearchQuery));
 				}
 			}
 		}
+
+		Collections.sort(results);
+
+		return results;
 	}
-	
-	/*
-	 * TODO
-	 * 
-	 * List<SearchQuery> list = ???
-	 * Map<String (location), SearchQuery> map = ???
-	 * 
-	 * for every query word
-	 * 		if query matches a key
-	 * 			for every location 
-	 * 				int count = ???
-	 * 				int index = ???
-	 * 
-	 * 				is this location in our map? 
-	 * 				if yes... update the existing result object
-	 * 				if no... add a new result object to the map AND the list
-	 * 
-	 * Collections.sort(list);
-	 * return list;
-	 * 
-	 * 
-	 */
 
 	/**
 	 * This method takes in an input file of search queries and checks if words
 	 * in the inverted index starts with the search term. The locations are then
 	 * saved to a SearchQuery object and sorted in a ranked order.
 	 * 
-	 * @param inputFile
-	 *            Location of file containing queries to be searched
+	 * @param queries
+	 *            queries to be searched
+	 * @return list of search results
 	 */
-	public void partialSearch(String inputfile) {
-		List<String> queryList = QueryParser.parseQuery(inputfile);
+	public List<SearchQuery> partialSearch(String[] queries) {
+		List<SearchQuery> results = new ArrayList<>();
 
-		for (String SearchQuery : queryList) {
+		Map<String, SearchQuery> resultmap = new TreeMap<>();
 
-			SearchQueries.put(SearchQuery, new ArrayList<>());
+		for (String query : queries) {
+			for (String word : words.tailMap(query).keySet()) {
 
-			for (String string : SearchQuery.split(" ")) {
+				if (word.startsWith(query)) {
+					for (String location : words.get(word).keySet()) {
+						int count = words.get(word).get(location).size();
+						int index = words.get(word).get(location).first();
 
-				// TODO We can tighten this loop... https://github.com/usf-cs212-2016/lectures/blob/master/Data%20Structures/src/FindDemo.java#L146
-				for (String word : words.keySet()) {
-
-					if (word.startsWith(string)) {
-						for (String filematch : words.get(word).keySet()) {
-
-							SearchQuery newQuery = new SearchQuery(filematch);
-							newQuery.setCount(words.get(word).get(filematch).size());
-							newQuery.setIndex(words.get(word).get(filematch).first());
-
-							if (SearchQueries.get(SearchQuery).contains(newQuery)) {
-
-								int index = SearchQueries.get(SearchQuery).indexOf(newQuery);
-								SearchQuery similarQuery = SearchQueries.get(SearchQuery).get(index);
-								similarQuery.setCount(similarQuery.getCount() + newQuery.getCount());
-
-								if (newQuery.getIndex() < similarQuery.getIndex()) {
-									similarQuery.setIndex(newQuery.getIndex());
-								}
-
-							} else {
-								SearchQueries.get(SearchQuery).add(newQuery);
-							}
+						if (resultmap.containsKey(location)) {
+							resultmap.get(location).update(count, index);
+						} else {
+							SearchQuery newquery = new SearchQuery(location);
+							newquery.setCount(count);
+							newquery.setIndex(index);
+							resultmap.put(location, newquery);
+							results.add(newquery);
 						}
-						Collections.sort(SearchQueries.get(SearchQuery));
 					}
 				}
 			}
 		}
+		Collections.sort(results);
+		return results;
 	}
 
 	/**
@@ -221,17 +159,6 @@ public class InvertedIndex {
 	 *            name of the JSON file to be written to
 	 */
 	public void toJSON(String outputFile) {
-		JSONFileWriter.IndexToJSON(Paths.get(outputFile), words);
-	}
-
-	/**
-	 * This method writes the search results to a default or custom named JSON
-	 * file
-	 * 
-	 * @param outputFile
-	 *            name of the JSON file to be written to
-	 */
-	public void SearchResultsToJSON(String outputFile) {
-		JSONFileWriter.SearchResultsToJSON(Paths.get(outputFile), SearchQueries);
+		JSONFileWriter.indexToJSON(Paths.get(outputFile), words);
 	}
 }

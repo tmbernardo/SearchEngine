@@ -3,7 +3,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
@@ -50,7 +49,7 @@ public class JSONFileWriter {
 	 * @param words
 	 *            TreeMap containing inverted index
 	 */
-	public static void IndexToJSON(Path outputFile, TreeMap<String, TreeMap<String, TreeSet<Integer>>> words) {
+	public static void indexToJSON(Path outputFile, TreeMap<String, TreeMap<String, TreeSet<Integer>>> words) {
 		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.forName("UTF8"));) {
 
 			writer.write("{" + END);
@@ -81,7 +80,7 @@ public class JSONFileWriter {
 	 * @param words
 	 *            TreeMap containing results of search
 	 */
-	public static void SearchResultsToJSON(Path outputFile, TreeMap<String, ArrayList<SearchQuery>> SearchQueries) {
+	public static void searchResultsToJSON(Path outputFile, TreeMap<String, List<SearchQuery>> SearchQueries) {
 
 		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.forName("UTF8"));) {
 
