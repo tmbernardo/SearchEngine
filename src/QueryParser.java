@@ -15,6 +15,10 @@ public class QueryParser {
 	private final InvertedIndex index;
 	private final TreeMap<String, List<SearchQuery>> results;
 
+	/**
+	 * TODO
+	 * @param index
+	 */
 	public QueryParser(InvertedIndex index) {
 		this.index = index;
 		this.results = new TreeMap<>();
@@ -29,7 +33,7 @@ public class QueryParser {
 	 */
 	public void parseQuery(String inputFile, boolean exact) {
 		String regex = "\\p{Punct}+";
-		new ArrayList<String>();
+		new ArrayList<String>(); // TODO Remove
 
 		try (BufferedReader reader = Files.newBufferedReader(Paths.get(inputFile), Charset.forName("UTF-8"));) {
 			String line = null;
@@ -46,6 +50,7 @@ public class QueryParser {
 				}
 			}
 		} catch (Exception e) {
+			// TODO Output the file path in the error message
 			System.out.println("QueryParser: File could not be opened!");
 		}
 	}

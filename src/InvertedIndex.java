@@ -64,10 +64,11 @@ public class InvertedIndex {
 	public List<SearchQuery> exactSearch(String[] queries) {
 		List<SearchQuery> results = new ArrayList<>();
 
-		Map<String, SearchQuery> resultmap = new TreeMap<>();
+		Map<String, SearchQuery> resultmap = new TreeMap<>(); // TODO Use HashMap
 
 		for (String query : queries) {
 			if (words.containsKey(query)) {
+				// TODO This for loop is the same in both, try to pull out into helper method
 				for (String location : words.get(query).keySet()) {
 					int count = words.get(query).get(location).size();
 					int index = words.get(query).get(location).first();
@@ -102,7 +103,7 @@ public class InvertedIndex {
 	public List<SearchQuery> partialSearch(String[] queries) {
 		List<SearchQuery> results = new ArrayList<>();
 
-		Map<String, SearchQuery> resultmap = new TreeMap<>();
+		Map<String, SearchQuery> resultmap = new TreeMap<>(); // TODO HashMap
 
 		for (String query : queries) {
 			for (String word : words.tailMap(query).keySet()) {
@@ -123,6 +124,9 @@ public class InvertedIndex {
 						}
 					}
 				}
+//				else { TODO
+//					break;
+//				}
 			}
 		}
 		Collections.sort(results);
