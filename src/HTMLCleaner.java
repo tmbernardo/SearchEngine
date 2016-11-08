@@ -59,6 +59,7 @@ public class HTMLCleaner {
 		int port = url.getPort() < 0 ? DEFAULT_PORT : url.getPort();
 
 		try (Socket socket = new Socket(url.getHost(), port);
+				// TODO Add UTF8 to the input stream reader constructor
 				BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				PrintWriter writer = new PrintWriter(socket.getOutputStream());) {
 			writer.println(request);

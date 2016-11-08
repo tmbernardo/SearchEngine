@@ -5,6 +5,8 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+// TODO Pull webcrawler stuff into web crawler class
+
 /**
  * Builds an inverted index from the files passed through to parseWords
  */

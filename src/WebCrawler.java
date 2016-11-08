@@ -29,7 +29,8 @@ public class WebCrawler {
 	 */
 	public static List<String> getURLs(String inputURL) {
 
-		List<String> urls = new ArrayList<String>();
+		// TODO Make these members and make this a hybrid does stuff and stores stuff class
+		List<String> urls = new ArrayList<String>(); // TODO Make this a set so contains() can be called on this easily, and use this to track whether you parsed this URL already not the queue
 		Queue<String> urlQueue = new LinkedList<String>();
 
 		urlQueue.add(inputURL);
@@ -102,6 +103,7 @@ public class WebCrawler {
 	private static String normalize(String link) throws MalformedURLException, URISyntaxException {
 		URI newURL;
 
+		// TODO Won't work for https, and also not necessary let URL handle it
 		if (!link.contains("http://")) {
 			newURL = new URL(base, "./" + link).toURI();
 		} else {
