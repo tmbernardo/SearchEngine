@@ -10,7 +10,7 @@ public class SearchQuery implements Comparable<SearchQuery> {
 	 * of the word in the file, (index) stores the first instance of the word in
 	 * the file
 	 */
-	private String where;
+	private String where; // TODO Make final
 	private int count;
 	private int index;
 
@@ -24,11 +24,15 @@ public class SearchQuery implements Comparable<SearchQuery> {
 		this.where = where;
 	}
 
+	/**
+	 * TODO
+	 * @return
+	 */
 	public String getWhere() {
 		return where;
 	}
 
-	public void setWhere(String where) {
+	public void setWhere(String where) { // TODO Remove
 		this.where = where;
 	}
 
@@ -90,6 +94,7 @@ public class SearchQuery implements Comparable<SearchQuery> {
 		return -result;
 	}
 
+	// TODO Usually override hashcode instead of equals
 	/**
 	 * Checks whether this file location is the same as the passed in object's
 	 * file location

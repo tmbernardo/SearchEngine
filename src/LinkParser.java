@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
  */
 public class LinkParser {
 
+	// TODO Remove http:// from the regex, also don't need so many groups?
 	/**
 	 * The regular expression used to parse the HTML for links.
 	 */
@@ -33,7 +34,7 @@ public class LinkParser {
 	 *            links
 	 * @return list of URLs found in HTML code
 	 */
-	public static ArrayList<String> listLinks(String text) {
+	public static ArrayList<String> listLinks(String text) { // TODO String/URL base
 		// list to store links
 		ArrayList<String> links = new ArrayList<String>();
 
@@ -45,6 +46,9 @@ public class LinkParser {
 
 		// loop through every match found in text
 		while (m.find()) {
+			// TODO String link = m.group(GROUP)
+			// TODO and then convert to absolute and remove fragments
+			
 			// add the appropriate group from regular expression to list
 			links.add(m.group(GROUP));
 		}
