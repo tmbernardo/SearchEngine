@@ -1,11 +1,8 @@
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-// TODO Pull webcrawler stuff into web crawler class
 
 /**
  * Builds an inverted index from the files passed through to parseWords
@@ -41,27 +38,4 @@ public class InvertedIndexBuilder {
 			System.out.println("InvertedIndexBuilder: File is invalid!");
 		}
 	}
-
-	public static void parseWordsUrl(String url, InvertedIndex index) {
-		String[] html = null;
-		try {
-			html = HTMLCleaner.fetchWords(url);
-		} catch (UnknownHostException e) {
-			System.out.println("parseWordsUrl: Host could not be determined!");
-		} catch (IOException e) {
-			System.out.println("pareWordsUrl: IOException from fetchWords");
-		}
-
-		int lineNumber = 0;
-
-		for (String word : html) {
-
-			lineNumber++;
-
-			if (!word.isEmpty()) {
-				index.add(word, lineNumber, url);
-			}
-		}
-	}
-
 }

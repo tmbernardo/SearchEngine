@@ -1,3 +1,6 @@
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,12 +17,10 @@ import java.util.regex.Pattern;
  * @see LinkTester
  */
 public class LinkParser {
-
-	// TODO Remove http:// from the regex, also don't need so many groups?
 	/**
 	 * The regular expression used to parse the HTML for links.
 	 */
-	public static final String REGEX = "(?i)(?:<a\\s+?.*?\\s?href\\s?.*?\\s?.*?\")((http://)?\\w+.*?\\.\\w+?)(?:\")";
+	public static final String REGEX = "(?i)(?:<a\\s+?.*?\\s?href\\s?.*?\\s?.*?\")(\\w+.*?\\..*?)(?:\")";
 
 	/**
 	 * The group in the regular expression that captures the raw link.
@@ -33,8 +34,13 @@ public class LinkParser {
 	 *            - valid HTML code, with quoted attributes and URL encoded
 	 *            links
 	 * @return list of URLs found in HTML code
+	 * @throws MalformedURLException
+	 * @throws URISyntaxException
 	 */
-	public static ArrayList<String> listLinks(String text) { // TODO String/URL base
+	public static ArrayList<String> listLinks(String baseUrl) throws MalformedURLException, URISyntaxException {
+		String text = null;
+
+		text = HTMLCleaner.fetchHTML(baseUrl);
 		// list to store links
 		ArrayList<String> links = new ArrayList<String>();
 
@@ -46,11 +52,10 @@ public class LinkParser {
 
 		// loop through every match found in text
 		while (m.find()) {
-			// TODO String link = m.group(GROUP)
-			// TODO and then convert to absolute and remove fragments
-			
+			String link = m.group(GROUP);
+			URL url = new URL(new URL(baseUrl), link);
 			// add the appropriate group from regular expression to list
-			links.add(m.group(GROUP));
+			links.add(url.toURI().normalize().toString());
 		}
 
 		return links;

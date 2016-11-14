@@ -10,7 +10,7 @@ public class SearchQuery implements Comparable<SearchQuery> {
 	 * of the word in the file, (index) stores the first instance of the word in
 	 * the file
 	 */
-	private String where; // TODO Make final
+	private final String where;
 	private int count;
 	private int index;
 
@@ -25,43 +25,77 @@ public class SearchQuery implements Comparable<SearchQuery> {
 	}
 
 	/**
-	 * TODO
-	 * @return
+	 * @return location of the search query as a string
 	 */
 	public String getWhere() {
 		return where;
 	}
 
-	public void setWhere(String where) { // TODO Remove
-		this.where = where;
-	}
-
+	/**
+	 * @return number of times that the word occurs in a particular location
+	 */
 	public int getCount() {
 		return count;
 	}
 
+	/**
+	 * sets the number of word occurrences in a particular location
+	 * 
+	 * @param length
+	 *            of hashmap containing integers
+	 */
 	public void setCount(int count) {
 		this.count = count;
 	}
 
+	/**
+	 * @return earliest location of word
+	 */
 	public int getIndex() {
 		return index;
 	}
 
+	/**
+	 * sets the first location of the search query
+	 * 
+	 * @param earliest
+	 *            location of word
+	 */
 	public void setIndex(int index) {
 		this.index = index;
 	}
 
+	/**
+	 * adds on to the current count if it appears again
+	 * 
+	 * @param count
+	 *            number of occurrences in a certain location
+	 */
 	public void updateCount(int count) {
 		this.count += count;
 	}
 
+	/**
+	 * sets the input index as the first occurrence if it is less than the
+	 * current
+	 * 
+	 * @param index
+	 *            first occurrence of a word
+	 */
 	public void updateIndex(int index) {
 		if (this.index > index) {
 			this.index = index;
 		}
 	}
 
+	/**
+	 * updates both count and index if applicable
+	 * 
+	 * @param count
+	 *            number of occurrences of the word in a location
+	 * @param index
+	 *            first location of word
+	 */
 	public void update(int count, int index) {
 		this.updateCount(count);
 		this.updateIndex(index);
@@ -78,7 +112,6 @@ public class SearchQuery implements Comparable<SearchQuery> {
 	 */
 	@Override
 	public int compareTo(SearchQuery compareQuery) {
-		// tried making both - but still didn't come out correct
 
 		int result = Integer.compare(this.count, compareQuery.count);
 
@@ -94,7 +127,6 @@ public class SearchQuery implements Comparable<SearchQuery> {
 		return -result;
 	}
 
-	// TODO Usually override hashcode instead of equals
 	/**
 	 * Checks whether this file location is the same as the passed in object's
 	 * file location
@@ -103,6 +135,6 @@ public class SearchQuery implements Comparable<SearchQuery> {
 	 */
 	@Override
 	public boolean equals(Object compareQuery) {
-		return where.equals(((SearchQuery) compareQuery).getWhere());
+		return this == compareQuery;
 	}
 }

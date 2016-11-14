@@ -2,7 +2,6 @@ import java.io.BufferedReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
@@ -16,7 +15,9 @@ public class QueryParser {
 	private final TreeMap<String, List<SearchQuery>> results;
 
 	/**
-	 * TODO
+	 * Constructor that saves the location of the InvertedIndex initializes the
+	 * results treemap
+	 * 
 	 * @param index
 	 */
 	public QueryParser(InvertedIndex index) {
@@ -33,10 +34,9 @@ public class QueryParser {
 	 */
 	public void parseQuery(String inputFile, boolean exact) {
 		String regex = "\\p{Punct}+";
-		new ArrayList<String>(); // TODO Remove
+		String line = null;
 
 		try (BufferedReader reader = Files.newBufferedReader(Paths.get(inputFile), Charset.forName("UTF-8"));) {
-			String line = null;
 
 			while ((line = reader.readLine()) != null) {
 				String cleaned = line.trim().toLowerCase().replaceAll(regex, "");
@@ -50,8 +50,8 @@ public class QueryParser {
 				}
 			}
 		} catch (Exception e) {
-			// TODO Output the file path in the error message
 			System.out.println("QueryParser: File could not be opened!");
+			System.out.println("Problem File: " + line);
 		}
 	}
 

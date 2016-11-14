@@ -1,13 +1,13 @@
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 
 /**
  * 
@@ -15,8 +15,32 @@ import java.util.Queue;
 public class WebCrawler {
 
 	private final static int MAXLINKS = 50;
+	private static URL url;
 
-	private static URL base;
+	private static Set<String> urls;
+	private static Queue<String> urlQueue;
+
+	public static void parseWordsUrl(String url, InvertedIndex index) {
+		String[] html = null;
+		try {
+			html = HTMLCleaner.fetchWords(url);
+		} catch (UnknownHostException e) {
+			System.out.println("parseWordsUrl: Host could not be determined!");
+		} catch (IOException e) {
+			System.out.println("pareWordsUrl: IOException from fetchWords");
+		}
+
+		int lineNumber = 0;
+
+		for (String word : html) {
+
+			lineNumber++;
+
+			if (!word.isEmpty()) {
+				index.add(word, lineNumber, url);
+			}
+		}
+	}
 
 	/**
 	 * Runs through a URL parsing all of the links within and saves them to a
@@ -27,22 +51,22 @@ public class WebCrawler {
 	 * 
 	 * @return urls list of URLs that have been found from originating link
 	 */
-	public static List<String> getURLs(String inputURL) {
+	public static Set<String> getURLs(String inputURL) {
 
-		// TODO Make these members and make this a hybrid does stuff and stores stuff class
-		List<String> urls = new ArrayList<String>(); // TODO Make this a set so contains() can be called on this easily, and use this to track whether you parsed this URL already not the queue
-		Queue<String> urlQueue = new LinkedList<String>();
+		urls = new HashSet<String>();
+		urlQueue = new LinkedList<String>();
 
 		urlQueue.add(inputURL);
 
-		while (urlQueue.size() < MAXLINKS && urls.size() < MAXLINKS && urlQueue.size() > 0) {
+		while (urls.size() < MAXLINKS && urlQueue.size() > 0) {
 
 			try {
-				base = new URL(urlQueue.remove());
+				url = new URL(urlQueue.remove());
+				urls.add(url.toString());
 
-				urls.add(base.toString());
-
-				addToQueue(base.toString(), urlQueue);
+				if (urls.size() + urlQueue.size() < MAXLINKS) {
+					addToQueue(url.toString(), urlQueue);
+				}
 
 			} catch (MalformedURLException e) {
 				System.out.println("getURLs: String could not be formatted to a URL");
@@ -52,15 +76,9 @@ public class WebCrawler {
 				System.out.println("getURLs: file IOException");
 			} catch (URISyntaxException e) {
 				System.out.println("getURLs: URISyntaxException");
+				e.printStackTrace();
 			}
 		}
-
-		while (urls.size() < MAXLINKS && urlQueue.size() > 0)
-
-		{
-			urls.add(urlQueue.remove());
-		}
-
 		return urls;
 	}
 
@@ -75,41 +93,12 @@ public class WebCrawler {
 	private static void addToQueue(String url, Queue<String> urlQueue)
 			throws UnknownHostException, IOException, URISyntaxException {
 
-		String html = null;
-
-		html = HTMLCleaner.fetchHTML(url);
-
-		ArrayList<String> linklist = LinkParser.listLinks(html);
+		ArrayList<String> linklist = LinkParser.listLinks(url);
 
 		if (linklist.size() > 0) {
 			for (String link : linklist) {
-
-				link = normalize(link);
-
-				if (!urlQueue.contains(link)) {
-					urlQueue.add(link);
-				}
+				urlQueue.add(link);
 			}
 		}
-	}
-
-	/**
-	 * Takes the URL and turns it into absolute then normalizes
-	 * 
-	 * @param link
-	 * 
-	 * @return normalized absolute URL returned as a string
-	 */
-	private static String normalize(String link) throws MalformedURLException, URISyntaxException {
-		URI newURL;
-
-		// TODO Won't work for https, and also not necessary let URL handle it
-		if (!link.contains("http://")) {
-			newURL = new URL(base, "./" + link).toURI();
-		} else {
-			newURL = new URI(link);
-		}
-
-		return newURL.normalize().toString();
 	}
 }

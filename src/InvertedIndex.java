@@ -1,8 +1,10 @@
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -45,10 +47,9 @@ public class InvertedIndex {
 	 * @param urls
 	 *            ArrayList of file locations
 	 */
-	public void invertedIndexUrl(List<String> urls) {
-
+	public void invertedIndexUrl(Set<String> urls) {
 		for (String url : urls) {
-			InvertedIndexBuilder.parseWordsUrl(url, this);
+			WebCrawler.parseWordsUrl(url, this);
 		}
 	}
 
@@ -63,31 +64,13 @@ public class InvertedIndex {
 	 */
 	public List<SearchQuery> exactSearch(String[] queries) {
 		List<SearchQuery> results = new ArrayList<>();
-
-		Map<String, SearchQuery> resultmap = new TreeMap<>(); // TODO Use HashMap
-
+		Map<String, SearchQuery> resultmap = new HashMap<>();
 		for (String query : queries) {
 			if (words.containsKey(query)) {
-				// TODO This for loop is the same in both, try to pull out into helper method
-				for (String location : words.get(query).keySet()) {
-					int count = words.get(query).get(location).size();
-					int index = words.get(query).get(location).first();
-
-					if (resultmap.containsKey(location)) {
-						resultmap.get(location).update(count, index);
-					} else {
-						SearchQuery newquery = new SearchQuery(location);
-						newquery.setCount(count);
-						newquery.setIndex(index);
-						resultmap.put(location, newquery);
-						results.add(newquery);
-					}
-				}
+				this.addResults(query, results, resultmap);
 			}
 		}
-
 		Collections.sort(results);
-
 		return results;
 	}
 
@@ -102,35 +85,35 @@ public class InvertedIndex {
 	 */
 	public List<SearchQuery> partialSearch(String[] queries) {
 		List<SearchQuery> results = new ArrayList<>();
-
-		Map<String, SearchQuery> resultmap = new TreeMap<>(); // TODO HashMap
-
+		Map<String, SearchQuery> resultmap = new HashMap<>();
 		for (String query : queries) {
 			for (String word : words.tailMap(query).keySet()) {
-
 				if (word.startsWith(query)) {
-					for (String location : words.get(word).keySet()) {
-						int count = words.get(word).get(location).size();
-						int index = words.get(word).get(location).first();
-
-						if (resultmap.containsKey(location)) {
-							resultmap.get(location).update(count, index);
-						} else {
-							SearchQuery newquery = new SearchQuery(location);
-							newquery.setCount(count);
-							newquery.setIndex(index);
-							resultmap.put(location, newquery);
-							results.add(newquery);
-						}
-					}
+					this.addResults(word, results, resultmap);
+				} else {
+					break;
 				}
-//				else { TODO
-//					break;
-//				}
 			}
 		}
 		Collections.sort(results);
 		return results;
+	}
+
+	private void addResults(String word, List<SearchQuery> results, Map<String, SearchQuery> resultmap) {
+		for (String location : words.get(word).keySet()) {
+			int count = words.get(word).get(location).size();
+			int index = words.get(word).get(location).first();
+
+			if (resultmap.containsKey(location)) {
+				resultmap.get(location).update(count, index);
+			} else {
+				SearchQuery newquery = new SearchQuery(location);
+				newquery.setCount(count);
+				newquery.setIndex(index);
+				resultmap.put(location, newquery);
+				results.add(newquery);
+			}
+		}
 	}
 
 	/**
