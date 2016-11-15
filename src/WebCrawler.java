@@ -15,11 +15,16 @@ import java.util.Set;
 public class WebCrawler {
 
 	private final static int MAXLINKS = 50;
+	 
+	// TODO This we should be able to use as a local variable
 	private static URL url;
 
-	private static Set<String> urls;
+	// TODO Why static? Make non-static, and final, and initialize in a constructor
+	private static Set<String> urls; // TODO Consider storing URL objects here and elsewhere?
 	private static Queue<String> urlQueue;
 
+	// TODO Every page html is fetched twice... need to find a way to fetch only once
+	
 	public static void parseWordsUrl(String url, InvertedIndex index) {
 		String[] html = null;
 		try {
@@ -56,9 +61,11 @@ public class WebCrawler {
 		urls = new HashSet<String>();
 		urlQueue = new LinkedList<String>();
 
+		// TODO Always add to the queue and the set at the same time
+		
 		urlQueue.add(inputURL);
 
-		while (urls.size() < MAXLINKS && urlQueue.size() > 0) {
+		while (urls.size() < MAXLINKS && urlQueue.size() > 0) { // TODO !urlQueue.isEmpty()
 
 			try {
 				url = new URL(urlQueue.remove());
@@ -100,5 +107,16 @@ public class WebCrawler {
 				urlQueue.add(link);
 			}
 		}
+		
+		/*
+		for (String link : linklist) {
+			if (urls.size() >= 50) {
+				break;
+			}
+			else if (!urls.contains(link)) 
+				add to both the queue and the set
+			}
+		}
+		*/
 	}
 }
