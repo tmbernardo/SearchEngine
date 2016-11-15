@@ -21,7 +21,8 @@ public class LinkParser {
 	 * The regular expression used to parse the HTML for links.
 	 */
 	public static final String REGEX = "(?i)(?:<a\\s+?.*?\\s?href\\s?.*?\\s?.*?\")(\\w+.*?\\..*?)(?:\")";
-
+	// TODO Could remove the extra non-capturing groups
+	
 	/**
 	 * The group in the regular expression that captures the raw link.
 	 */
@@ -54,6 +55,9 @@ public class LinkParser {
 		while (m.find()) {
 			String link = m.group(GROUP);
 			URL url = new URL(new URL(baseUrl), link);
+			// TODO Remove fragments here too?
+			// URL cleaned = new URL(url.getProtocol(), url.getHost(), url.getFile());
+			
 			// add the appropriate group from regular expression to list
 			links.add(url.toURI().normalize().toString());
 		}

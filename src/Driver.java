@@ -33,6 +33,7 @@ public class Driver {
 
 		if (argParser.hasValue(dir_flag)) {
 			List<String> fileLocations = DirectoryTraverser.traverse(argParser.getValue(dir_flag));
+			// TODO InvertedIndexBuilder.parseWordsDir(fileLocations, index);
 			index.invertedIndexDir(fileLocations);
 		}
 
