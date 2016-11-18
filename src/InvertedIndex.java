@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -27,30 +26,6 @@ public class InvertedIndex {
 	 */
 	public InvertedIndex() {
 		this.words = new TreeMap<>();
-	}
-
-	/**
-	 * Takes in an ArrayList containing the file locations
-	 * 
-	 * @param fileLocations
-	 *            ArrayList of file locations
-	 */
-	public void invertedIndexDir(List<String> fileLocations) {
-		for (String string : fileLocations) {
-			InvertedIndexBuilder.parseWordsDir(Paths.get(string), this);
-		}
-	}
-
-	/**
-	 * Takes in an ArrayList containing the URLs
-	 * 
-	 * @param urls
-	 *            ArrayList of file locations
-	 */
-	public void invertedIndexUrl(Set<String> urls) {
-		for (String url : urls) {
-			WebCrawler.parseWordsUrl(url, this);
-		}
 	}
 
 	/**

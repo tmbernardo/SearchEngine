@@ -15,36 +15,19 @@ import java.util.Set;
 public class WebCrawler {
 
 	private final static int MAXLINKS = 50;
-	 
-	// TODO This we should be able to use as a local variable
-	private static URL url;
 
-	// TODO Why static? Make non-static, and final, and initialize in a constructor
-	private static Set<String> urls; // TODO Consider storing URL objects here and elsewhere?
-	private static Queue<String> urlQueue;
+	private final Set<URL> urls;
+	private final Queue<URL> urlQueue;
+	public InvertedIndex index;
 
-	// TODO Every page html is fetched twice... need to find a way to fetch only once
-	
-	public static void parseWordsUrl(String url, InvertedIndex index) {
-		String[] html = null;
-		try {
-			html = HTMLCleaner.fetchWords(url);
-		} catch (UnknownHostException e) {
-			System.out.println("parseWordsUrl: Host could not be determined!");
-		} catch (IOException e) {
-			System.out.println("pareWordsUrl: IOException from fetchWords");
-		}
+	public WebCrawler() {
+		urls = new HashSet<URL>();
+		urlQueue = new LinkedList<URL>();
+	}
 
-		int lineNumber = 0;
-
-		for (String word : html) {
-
-			lineNumber++;
-
-			if (!word.isEmpty()) {
-				index.add(word, lineNumber, url);
-			}
-		}
+	public WebCrawler(InvertedIndex index) {
+		this();
+		this.index = index;
 	}
 
 	/**
@@ -56,37 +39,34 @@ public class WebCrawler {
 	 * 
 	 * @return urls list of URLs that have been found from originating link
 	 */
-	public static Set<String> getURLs(String inputURL) {
+	public void crawl(String inputURL) {
+		try {
+			urlQueue.add(new URL(inputURL));
+			urls.add(new URL(inputURL));
 
-		urls = new HashSet<String>();
-		urlQueue = new LinkedList<String>();
+			while (!urlQueue.isEmpty()) {
 
-		// TODO Always add to the queue and the set at the same time
-		
-		urlQueue.add(inputURL);
-
-		while (urls.size() < MAXLINKS && urlQueue.size() > 0) { // TODO !urlQueue.isEmpty()
-
-			try {
-				url = new URL(urlQueue.remove());
-				urls.add(url.toString());
+				URL url = urlQueue.remove();
+				String html = HTMLCleaner.fetchHTML(url.toString());
 
 				if (urls.size() + urlQueue.size() < MAXLINKS) {
-					addToQueue(url.toString(), urlQueue);
+					this.addToQueue(url, html);
 				}
 
-			} catch (MalformedURLException e) {
-				System.out.println("getURLs: String could not be formatted to a URL");
-			} catch (UnknownHostException e) {
-				System.out.println("getURLs: Host is unknown");
-			} catch (IOException e) {
-				System.out.println("getURLs: file IOException");
-			} catch (URISyntaxException e) {
-				System.out.println("getURLs: URISyntaxException");
-				e.printStackTrace();
+				this.parseWordsUrl(url, html);
+
 			}
+		} catch (MalformedURLException e) {
+			System.out.println("getURLs: String could not be formatted to a URL");
+		} catch (UnknownHostException e) {
+			System.out.println("getURLs: Host is unknown");
+		} catch (IOException e) {
+			System.out.println("getURLs: file IOException");
+		} catch (URISyntaxException e) {
+			System.out.println("getURLs: URISyntaxException");
+			e.printStackTrace();
 		}
-		return urls;
+
 	}
 
 	/**
@@ -97,26 +77,44 @@ public class WebCrawler {
 	 * @param urlQueue
 	 *            Queue of URLs to go through if length is < 50
 	 */
-	private static void addToQueue(String url, Queue<String> urlQueue)
-			throws UnknownHostException, IOException, URISyntaxException {
+	private void addToQueue(URL url, String html) throws UnknownHostException, IOException, URISyntaxException {
 
-		ArrayList<String> linklist = LinkParser.listLinks(url);
+		ArrayList<URL> linklist = LinkParser.listLinks(url.toString(), html);
 
-		if (linklist.size() > 0) {
-			for (String link : linklist) {
-				urlQueue.add(link);
-			}
-		}
-		
-		/*
-		for (String link : linklist) {
+		for (URL link : linklist) {
 			if (urls.size() >= 50) {
 				break;
-			}
-			else if (!urls.contains(link)) 
-				add to both the queue and the set
+			} else {
+				if (!urls.contains(link)) {
+					urlQueue.add(link);
+					urls.add(link);
+				}
 			}
 		}
-		*/
+	}
+
+	/**
+	 * Parses the html for words and adds the words to the inverted index
+	 * 
+	 * @param url
+	 *            url that is currently being parsed
+	 * @param html
+	 *            html to parse
+	 */
+	private void parseWordsUrl(URL url, String html) throws UnknownHostException, IOException {
+		String[] words = null;
+
+		words = HTMLCleaner.fetchWords(html);
+
+		int lineNumber = 0;
+
+		for (String word : words) {
+
+			lineNumber++;
+
+			if (!word.isEmpty()) {
+				index.add(word, lineNumber, url.toString());
+			}
+		}
 	}
 }

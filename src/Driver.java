@@ -1,5 +1,4 @@
 import java.util.List;
-import java.util.Set;
 
 /**
  * Driver
@@ -28,18 +27,14 @@ public class Driver {
 		ArgumentParser argParser = new ArgumentParser();
 		argParser.parseArguments(args);
 
-		// TODO Project 3 Hints: It is a little backwards to have the index call
-		// builder classes instead of builder classes calling the index
-
 		if (argParser.hasValue(dir_flag)) {
 			List<String> fileLocations = DirectoryTraverser.traverse(argParser.getValue(dir_flag));
-			// TODO InvertedIndexBuilder.parseWordsDir(fileLocations, index);
-			index.invertedIndexDir(fileLocations);
+			InvertedIndexBuilder.buildIndex(fileLocations, index);
 		}
 
 		if (argParser.hasValue(url_flag)) {
-			Set<String> urls = WebCrawler.getURLs(argParser.getValue(url_flag));
-			index.invertedIndexUrl(urls);
+			WebCrawler crawler = new WebCrawler(index);
+			crawler.crawl(argParser.getValue(url_flag));
 		}
 
 		if (argParser.hasValue(exact_flag)) {

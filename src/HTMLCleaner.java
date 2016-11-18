@@ -140,9 +140,7 @@ public class HTMLCleaner {
 	 * @throws IOException
 	 * @throws UnknownHostException
 	 */
-	public static String[] fetchWords(String url) throws UnknownHostException, IOException {
-		// THIS METHOD IS PROVIDED FOR YOU. DO NOT MODIFY.
-		String html = fetchHTML(url);
+	public static String[] fetchWords(String html) throws UnknownHostException, IOException {
 		String text = cleanHTML(html);
 		return parseWords(text);
 	}

@@ -20,13 +20,12 @@ public class LinkParser {
 	/**
 	 * The regular expression used to parse the HTML for links.
 	 */
-	public static final String REGEX = "(?i)(?:<a\\s+?.*?\\s?href\\s?.*?\\s?.*?\")(\\w+.*?\\..*?)(?:\")";
-	// TODO Could remove the extra non-capturing groups
-	
+	public static final String REGEX = "(?i)(<a\\s+?.*?\\s?href\\s?.*?\\s?.*?\")(\\w+.*?\\..*?)(\")";
+
 	/**
 	 * The group in the regular expression that captures the raw link.
 	 */
-	public static final int GROUP = 1;
+	public static final int GROUP = 2;
 
 	/**
 	 * Parses the provided text for HTML links.
@@ -38,28 +37,26 @@ public class LinkParser {
 	 * @throws MalformedURLException
 	 * @throws URISyntaxException
 	 */
-	public static ArrayList<String> listLinks(String baseUrl) throws MalformedURLException, URISyntaxException {
-		String text = null;
+	public static ArrayList<URL> listLinks(String baseUrl, String html)
+			throws MalformedURLException, URISyntaxException {
 
-		text = HTMLCleaner.fetchHTML(baseUrl);
 		// list to store links
-		ArrayList<String> links = new ArrayList<String>();
+		ArrayList<URL> links = new ArrayList<URL>();
 
 		// compile string into regular expression
 		Pattern p = Pattern.compile(REGEX);
 
 		// match provided text against regular expression
-		Matcher m = p.matcher(text);
+		Matcher m = p.matcher(html);
 
 		// loop through every match found in text
 		while (m.find()) {
 			String link = m.group(GROUP);
 			URL url = new URL(new URL(baseUrl), link);
-			// TODO Remove fragments here too?
-			// URL cleaned = new URL(url.getProtocol(), url.getHost(), url.getFile());
-			
+			URL cleaned = new URL(url.getProtocol(), url.getHost(), url.getFile());
+
 			// add the appropriate group from regular expression to list
-			links.add(url.toURI().normalize().toString());
+			links.add(cleaned);
 		}
 
 		return links;
