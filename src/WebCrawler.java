@@ -13,13 +13,18 @@ import java.util.Set;
  * 
  */
 public class WebCrawler {
+	
+	// TODO Multithread this (new class), instead of urlQueue, replace that with a work queue.
+	// TODO Where you added to the queue, you now add a worker to the work queue 
+	// TODO Where you wait for the queue to be empty, wait until no more pending work
 
 	private final static int MAXLINKS = 50;
 
 	private final Set<URL> urls;
 	private final Queue<URL> urlQueue;
-	public InvertedIndex index;
+	public InvertedIndex index; // TODO final
 
+	// TODO Remove, just have the one that takes an index
 	public WebCrawler() {
 		urls = new HashSet<URL>();
 		urlQueue = new LinkedList<URL>();
@@ -49,6 +54,7 @@ public class WebCrawler {
 				URL url = urlQueue.remove();
 				String html = HTMLCleaner.fetchHTML(url.toString());
 
+				// TODO Check the urls.size() not urlQueue.size() (move this to before listLinks in the private method)
 				if (urls.size() + urlQueue.size() < MAXLINKS) {
 					this.addToQueue(url, html);
 				}
@@ -66,7 +72,8 @@ public class WebCrawler {
 			System.out.println("getURLs: URISyntaxException");
 			e.printStackTrace();
 		}
-
+		// TODO Clean up exception handling
+		// catch (IOException e) { "Unable to crawl page" "
 	}
 
 	/**
@@ -102,9 +109,7 @@ public class WebCrawler {
 	 *            html to parse
 	 */
 	private void parseWordsUrl(URL url, String html) throws UnknownHostException, IOException {
-		String[] words = null;
-
-		words = HTMLCleaner.fetchWords(html);
+		String[] words = HTMLCleaner.fetchWords(html);
 
 		int lineNumber = 0;
 
