@@ -50,5 +50,15 @@ public class Driver {
 		if (argParser.hasFlag(index_flag)) {
 			index.toJSON(argParser.getValue(index_flag, jsonFileName));
 		}
+		
+		/*
+		 * TODO Project 4 Driver
+		 * if (not multithreading)
+		 * 		eveyrthing you have above
+		 * else
+		 * 		everything you have above, changing one thing at a time to multithreaded
+		 * 
+		 * 
+		 */
 	}
 }

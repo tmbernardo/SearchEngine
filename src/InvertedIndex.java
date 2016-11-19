@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+// TODO Project 4 Create a new thread-safe inverted index that extends this class, use synchronized
+
 /**
  * This class stores a word, file path, and location into a triply nested
  * collection (words) structure.
