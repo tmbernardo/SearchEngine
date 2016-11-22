@@ -72,8 +72,8 @@ public class WorkQueue {
 	 *            work request (in the form of a {@link Runnable} object)
 	 */
 	public void execute(Runnable r) {
+		incrementPending();
 		synchronized (queue) {
-			incrementPending();
 			queue.addLast(r);
 			queue.notifyAll();
 		}
@@ -82,15 +82,11 @@ public class WorkQueue {
 	/**
 	 * Waits for all pending work to be finished.
 	 */
-	public void finish() {
+	public synchronized void finish() {
 		try {
 			while (this.pending > 0) {
 				logger.debug("Waiting until finished");
-
-				synchronized (this) {
-					this.wait();
-				}
-
+				this.wait();
 			}
 		} catch (InterruptedException e) {
 			logger.debug("Finish interrupted", e);
@@ -155,11 +151,11 @@ public class WorkQueue {
 
 				try {
 					r.run();
-					decrementPending();
 				} catch (RuntimeException ex) {
 					// catch runtime exceptions to avoid leaking threads
 					System.err.println("Warning: Work queue encountered an " + "exception while running.");
 				}
+				decrementPending();
 			}
 		}
 	}

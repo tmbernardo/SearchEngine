@@ -30,10 +30,12 @@ public class ConcurrentSearcher {
 
 	/**
 	 * Goes through search terms in an input file line by line and cleans and
-	 * adds each word to a list
+	 * adds each word to a list then executes
 	 * 
 	 * @param inputFile
 	 *            file to parse search terms from
+	 * @param exact
+	 *            if exact searches for the exact term
 	 */
 	public void parseQuery(String inputFile, boolean exact) {
 		String regex = "\\p{Punct}+";
@@ -46,7 +48,7 @@ public class ConcurrentSearcher {
 				String[] words = cleaned.split("\\s+");
 				Arrays.sort(words);
 
-				minions.execute(new QueryMinion(String.join(" ", words), words, exact));
+				minions.execute(new QueryMinion(words, exact));
 			}
 		} catch (Exception e) {
 			System.out.println("Searcher: File could not be opened!");
@@ -57,12 +59,10 @@ public class ConcurrentSearcher {
 	}
 
 	private class QueryMinion implements Runnable {
-		String word;
 		String[] words;
 		boolean exact;
 
-		public QueryMinion(String word, String[] words, boolean exact) {
-			this.word = word;
+		public QueryMinion(String[] words, boolean exact) {
 			this.words = words;
 			this.exact = exact;
 			logger.debug("Minion created for {}", String.join(" ", words));
@@ -71,9 +71,9 @@ public class ConcurrentSearcher {
 		@Override
 		public void run() {
 			if (exact) {
-				results.put(String.join(" ", word), index.exactSearch(words));
+				results.put(String.join(" ", words), index.exactSearch(words));
 			} else {
-				results.put(String.join(" ", word), index.partialSearch(words));
+				results.put(String.join(" ", words), index.partialSearch(words));
 			}
 			logger.debug("Minion for {} completed", String.join(" ", words));
 		}
