@@ -12,9 +12,6 @@ public class ConcurrentIndexBuilder {
 	private static WorkQueue minions;
 
 	public static void buildIndex(List<String> fileLocations, ConcurrentIndex index, int threads) {
-		if (threads < 1) {
-			throw new IllegalArgumentException("threads are < 1");
-		}
 
 		minions = new WorkQueue(threads);
 

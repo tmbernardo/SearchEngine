@@ -38,6 +38,11 @@ public class Driver {
 
 			int threads = argParser.getValue(multi_flag, defaultThreads);
 
+			if (threads < 1) {
+				System.err.println("Invalid thread input: setting threads to default 5");
+				threads = defaultThreads;
+			}
+
 			ConcurrentIndex threadSafeIndex = new ConcurrentIndex();
 			ConcurrentSearcher multiThreadSearcher = new ConcurrentSearcher(threadSafeIndex, threads);
 

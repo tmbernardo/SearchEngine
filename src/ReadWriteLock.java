@@ -56,7 +56,6 @@ public class ReadWriteLock {
 				Thread.currentThread().interrupt();
 			}
 		}
-
 		writers++;
 	}
 
