@@ -7,13 +7,12 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-// TODO Project 4 Create a new thread-safe inverted index that extends this class, use synchronized
-
 /**
  * This class stores a word, file path, and location into a triply nested
  * collection (words) structure.
  */
 public class InvertedIndex {
+	// private static final Logger logger = LogManager.getLogger();
 	/**
 	 * words indexes all words found in the inputed directory/file.
 	 * SearchQueries stores the results of all files where certain search
@@ -105,14 +104,18 @@ public class InvertedIndex {
 	 *            name of the file where the word is found
 	 */
 	public void add(String word, int lineNumber, String fileName) {
+		// logger.debug("Adding '{}' to words", word);
 		if (!words.containsKey(word)) {
 			words.put(word, new TreeMap<>());
 		}
-
 		if (!words.get(word).containsKey(fileName)) {
 			words.get(word).put(fileName, new TreeSet<>());
 		}
 		words.get(word).get(fileName).add(lineNumber);
+	}
+
+	public TreeMap<String, TreeMap<String, TreeSet<Integer>>> wordsCopy() {
+		return new TreeMap<String, TreeMap<String, TreeSet<Integer>>>(words);
 	}
 
 	/**

@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * Takes objects from a TreeMap and outputs them in a "pretty" JSON format.
  */
@@ -17,6 +20,8 @@ public class JSONFileWriter {
 
 	/** End of line character used for pretty JSON output. */
 	public static final char END = '\n';
+
+	final static Logger logger = LogManager.getLogger();
 
 	/**
 	 * Returns a quoted version of the provided text.
@@ -69,6 +74,7 @@ public class JSONFileWriter {
 
 		} catch (Exception e) {
 			System.err.println("IndexToJson: File cannot be written!");
+			logger.debug(e);
 		}
 	}
 

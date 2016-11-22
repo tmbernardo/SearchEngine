@@ -6,9 +6,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-// TODO Leave this alone create a new multithreaded builder class
-// TODO Each "task" or run() method will basically do parseWordsDir
-
 /**
  * Builds an inverted index from the files passed through to parseWords
  */
@@ -36,7 +33,7 @@ public class InvertedIndexBuilder {
 	 *            inverted index to add words to
 	 * 
 	 */
-	private static void parseWordsDir(Path inputFile, InvertedIndex index) { // TODO Public?
+	public static void parseWordsDir(Path inputFile, InvertedIndex index) {
 		int lineNumber = 0;
 
 		try (BufferedReader reader = Files.newBufferedReader(inputFile, Charset.forName("UTF-8"));) {

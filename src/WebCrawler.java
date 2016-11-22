@@ -1,5 +1,4 @@
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -13,26 +12,17 @@ import java.util.Set;
  * 
  */
 public class WebCrawler {
-	
-	// TODO Multithread this (new class), instead of urlQueue, replace that with a work queue.
-	// TODO Where you added to the queue, you now add a worker to the work queue 
-	// TODO Where you wait for the queue to be empty, wait until no more pending work
 
 	private final static int MAXLINKS = 50;
 
 	private final Set<URL> urls;
 	private final Queue<URL> urlQueue;
-	public InvertedIndex index; // TODO final
-
-	// TODO Remove, just have the one that takes an index
-	public WebCrawler() {
-		urls = new HashSet<URL>();
-		urlQueue = new LinkedList<URL>();
-	}
+	public final InvertedIndex index;
 
 	public WebCrawler(InvertedIndex index) {
-		this();
 		this.index = index;
+		urls = new HashSet<URL>();
+		urlQueue = new LinkedList<URL>();
 	}
 
 	/**
@@ -54,26 +44,17 @@ public class WebCrawler {
 				URL url = urlQueue.remove();
 				String html = HTMLCleaner.fetchHTML(url.toString());
 
-				// TODO Check the urls.size() not urlQueue.size() (move this to before listLinks in the private method)
-				if (urls.size() + urlQueue.size() < MAXLINKS) {
-					this.addToQueue(url, html);
-				}
-
+				this.addToQueue(url, html);
 				this.parseWordsUrl(url, html);
 
 			}
-		} catch (MalformedURLException e) {
-			System.out.println("getURLs: String could not be formatted to a URL");
 		} catch (UnknownHostException e) {
 			System.out.println("getURLs: Host is unknown");
 		} catch (IOException e) {
-			System.out.println("getURLs: file IOException");
+			System.out.println("Unable to crawl page");
 		} catch (URISyntaxException e) {
 			System.out.println("getURLs: URISyntaxException");
-			e.printStackTrace();
 		}
-		// TODO Clean up exception handling
-		// catch (IOException e) { "Unable to crawl page" "
 	}
 
 	/**
@@ -85,16 +66,17 @@ public class WebCrawler {
 	 *            Queue of URLs to go through if length is < 50
 	 */
 	private void addToQueue(URL url, String html) throws UnknownHostException, IOException, URISyntaxException {
+		if (urls.size() < MAXLINKS) {
+			ArrayList<URL> linklist = LinkParser.listLinks(url.toString(), html);
 
-		ArrayList<URL> linklist = LinkParser.listLinks(url.toString(), html);
-
-		for (URL link : linklist) {
-			if (urls.size() >= 50) {
-				break;
-			} else {
-				if (!urls.contains(link)) {
-					urlQueue.add(link);
-					urls.add(link);
+			for (URL link : linklist) {
+				if (urls.size() >= 50) {
+					break;
+				} else {
+					if (!urls.contains(link)) {
+						urlQueue.add(link);
+						urls.add(link);
+					}
 				}
 			}
 		}
