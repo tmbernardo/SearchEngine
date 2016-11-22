@@ -9,11 +9,6 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-// TODO Multithread this (new class), instead of urlQueue, replace that with
-// a work queue.
-// TODO Where you added to the queue, you now add a worker to the work queue
-// TODO Where you wait for the queue to be empty, wait until no more pending
-// work
 public class ConcurrentWebCrawler {
 
 	private static final Logger logger = LogManager.getLogger();

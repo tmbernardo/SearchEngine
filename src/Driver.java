@@ -28,9 +28,8 @@ public class Driver {
 		int defaultThreads = 5;
 
 		InvertedIndex index = new InvertedIndex();
-		ConcurrentIndex threadSafeIndex = new ConcurrentIndex();
 
-		QueryParser searcher = new QueryParser(index);
+		Searcher searcher = new Searcher(index);
 
 		ArgumentParser argParser = new ArgumentParser();
 		argParser.parseArguments(args);
@@ -38,6 +37,10 @@ public class Driver {
 		if (argParser.hasFlag(multi_flag)) {
 
 			int threads = argParser.getValue(multi_flag, defaultThreads);
+
+			ConcurrentIndex threadSafeIndex = new ConcurrentIndex();
+			ConcurrentSearcher multiThreadSearcher = new ConcurrentSearcher(threadSafeIndex, threads);
+
 			logger.debug("Multithreading index, Threads: {}", argParser.getValue(multi_flag, defaultThreads));
 
 			if (argParser.hasValue(dir_flag)) {
@@ -51,13 +54,13 @@ public class Driver {
 			}
 
 			if (argParser.hasValue(exact_flag)) {
-				searcher.parseQuery(argParser.getValue(exact_flag), true);
-				searcher.toJSON(argParser.getValue(results_flag, resultsFileName));
+				multiThreadSearcher.parseQuery(argParser.getValue(exact_flag), true);
+				multiThreadSearcher.toJSON(argParser.getValue(results_flag, resultsFileName));
 			}
 
 			if (argParser.hasValue(query_flag)) {
-				searcher.parseQuery(argParser.getValue(query_flag), false);
-				searcher.toJSON(argParser.getValue(results_flag, resultsFileName));
+				multiThreadSearcher.parseQuery(argParser.getValue(query_flag), false);
+				multiThreadSearcher.toJSON(argParser.getValue(results_flag, resultsFileName));
 			}
 
 			if (argParser.hasFlag(index_flag)) {

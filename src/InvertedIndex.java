@@ -75,7 +75,7 @@ public class InvertedIndex {
 		return results;
 	}
 
-	private void addResults(String word, List<SearchQuery> results, Map<String, SearchQuery> resultmap) {
+	public void addResults(String word, List<SearchQuery> results, Map<String, SearchQuery> resultmap) {
 		for (String location : words.get(word).keySet()) {
 			int count = words.get(word).get(location).size();
 			int index = words.get(word).get(location).first();

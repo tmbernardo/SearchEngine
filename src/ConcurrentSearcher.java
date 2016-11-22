@@ -6,16 +6,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
 
-// TODO Project 4: Create a multithreaded version with a thread-safe index (do not extend)
-// TODO protect access to results, each task will handle 1 line
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-/**
- * Parses the queries given in an input file
- */
+public class ConcurrentSearcher {
+	private static final Logger logger = LogManager.getLogger();
 
-public class QueryParser {
-	private final InvertedIndex index;
+	private final ConcurrentIndex index;
 	private final TreeMap<String, List<SearchQuery>> results;
+	private final WorkQueue minions;
 
 	/**
 	 * Constructor that saves the location of the InvertedIndex initializes the
@@ -23,9 +22,10 @@ public class QueryParser {
 	 * 
 	 * @param index
 	 */
-	public QueryParser(InvertedIndex index) {
+	public ConcurrentSearcher(ConcurrentIndex index, int threads) {
 		this.index = index;
 		this.results = new TreeMap<>();
+		this.minions = new WorkQueue(threads);
 	}
 
 	/**
@@ -46,16 +46,38 @@ public class QueryParser {
 				String[] words = cleaned.split("\\s+");
 				Arrays.sort(words);
 
-				if (exact) {
-					results.put(String.join(" ", words), index.exactSearch(words));
-				} else {
-					results.put(String.join(" ", words), index.partialSearch(words));
-				}
+				minions.execute(new QueryMinion(String.join(" ", words), words, exact));
 			}
 		} catch (Exception e) {
-			System.out.println("QueryParser: File could not be opened!");
+			System.out.println("Searcher: File could not be opened!");
 			System.out.println("Problem File: " + line);
 		}
+
+		minions.shutdown();
+	}
+
+	private class QueryMinion implements Runnable {
+		String word;
+		String[] words;
+		boolean exact;
+
+		public QueryMinion(String word, String[] words, boolean exact) {
+			this.word = word;
+			this.words = words;
+			this.exact = exact;
+			logger.debug("Minion created for {}", String.join(" ", words));
+		}
+
+		@Override
+		public void run() {
+			if (exact) {
+				results.put(String.join(" ", word), index.exactSearch(words));
+			} else {
+				results.put(String.join(" ", word), index.partialSearch(words));
+			}
+			logger.debug("Minion for {} completed", String.join(" ", words));
+		}
+
 	}
 
 	/**
@@ -66,6 +88,7 @@ public class QueryParser {
 	 *            name of the JSON file to be written to
 	 */
 	public void toJSON(String outputFile) {
+		logger.debug("Writing to {}", outputFile);
 		JSONFileWriter.searchResultsToJSON(Paths.get(outputFile), results);
 	}
 }

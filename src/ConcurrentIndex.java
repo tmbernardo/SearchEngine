@@ -1,14 +1,16 @@
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-// TODO Project 4 Create a new thread-safe inverted index that extends inverted index, use synchronized
 // TODO convert to custom lock
 public class ConcurrentIndex extends InvertedIndex {
+
 	private static final Logger logger = LogManager.getLogger();
+
 	// private ReadWriteLock lock;
 
 	public ConcurrentIndex() {
@@ -24,6 +26,11 @@ public class ConcurrentIndex extends InvertedIndex {
 	@Override
 	public synchronized List<SearchQuery> partialSearch(String[] queries) {
 		return super.partialSearch(queries);
+	}
+
+	@Override
+	public synchronized void addResults(String word, List<SearchQuery> results, Map<String, SearchQuery> resultmap) {
+		super.addResults(word, results, resultmap);
 	}
 
 	@Override
