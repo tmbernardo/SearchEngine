@@ -11,41 +11,57 @@ public class ConcurrentIndex extends InvertedIndex {
 
 	private static final Logger logger = LogManager.getLogger();
 
-	// private ReadWriteLock lock;
+	private ReadWriteLock lock;
 
 	public ConcurrentIndex() {
 		super();
-		// this.lock = new ReadWriteLock();
+		this.lock = new ReadWriteLock();
 	}
 
 	@Override
-	public synchronized List<SearchQuery> exactSearch(String[] queries) {
+	public List<SearchQuery> exactSearch(String[] queries) {
 		return super.exactSearch(queries);
 	}
 
 	@Override
-	public synchronized List<SearchQuery> partialSearch(String[] queries) {
+	public List<SearchQuery> partialSearch(String[] queries) {
 		return super.partialSearch(queries);
 	}
 
 	@Override
-	public synchronized void addResults(String word, List<SearchQuery> results, Map<String, SearchQuery> resultmap) {
-		super.addResults(word, results, resultmap);
+	public void addResults(String word, List<SearchQuery> results, Map<String, SearchQuery> resultmap) {
+		for (String location : this.wordsCopy().get(word).keySet()) {
+			int count = this.wordsCopy().get(word).get(location).size();
+			int index = this.wordsCopy().get(word).get(location).first();
+
+			lock.lockReadWrite();
+			if (resultmap.containsKey(location)) {
+				resultmap.get(location).update(count, index);
+			} else {
+				SearchQuery newquery = new SearchQuery(location);
+				newquery.setCount(count);
+				newquery.setIndex(index);
+				resultmap.put(location, newquery);
+				results.add(newquery);
+			}
+			lock.unlockReadWrite();
+		}
 	}
 
 	@Override
-	public synchronized TreeMap<String, TreeMap<String, TreeSet<Integer>>> wordsCopy() {
+	public TreeMap<String, TreeMap<String, TreeSet<Integer>>> wordsCopy() {
 		return super.wordsCopy();
 	}
 
 	@Override
-	public synchronized void add(String word, int lineNumber, String fileName) {
-		// logger.debug("ConcurrentIndex: Adding {}", word);
+	public void add(String word, int lineNumber, String fileName) {
+		lock.lockReadWrite();
 		super.add(word, lineNumber, fileName);
+		lock.unlockReadWrite();
 	}
 
 	@Override
-	public synchronized void toJSON(String outputFile) {
+	public void toJSON(String outputFile) {
 		logger.debug("Writing to {}", outputFile);
 		logger.debug("size of words: {}", this.wordsCopy().size());
 		super.toJSON(outputFile);

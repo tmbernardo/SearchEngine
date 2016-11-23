@@ -6,9 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
 
-// TODO Project 4: Create a multithreaded version with a thread-safe index (do not extend)
-// TODO protect access to results, each task will handle 1 line
-
 /**
  * Parses the queries given in an input file
  */
