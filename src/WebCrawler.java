@@ -9,7 +9,8 @@ import java.util.Queue;
 import java.util.Set;
 
 /**
- * 
+ * This class crawls through a given url, parses all words, and adds the cleaned
+ * words to an Inverted Index
  */
 public class WebCrawler {
 
@@ -19,6 +20,12 @@ public class WebCrawler {
 	private final Queue<URL> urlQueue;
 	public final InvertedIndex index;
 
+	/**
+	 * Initializes the urls and urlQueue to save links to
+	 * 
+	 * @param index
+	 *            InvertedIndex to add words to
+	 */
 	public WebCrawler(InvertedIndex index) {
 		this.index = index;
 		urls = new HashSet<URL>();
@@ -48,12 +55,9 @@ public class WebCrawler {
 				this.parseWordsUrl(url, html);
 
 			}
-		} catch (UnknownHostException e) {
-			System.out.println("getURLs: Host is unknown");
-		} catch (IOException e) {
-			System.out.println("Unable to crawl page");
-		} catch (URISyntaxException e) {
-			System.out.println("getURLs: URISyntaxException");
+		} catch (Exception e) {
+			System.err.println("getURLs: Unable to open url " + inputURL);
+			System.err.println(e);
 		}
 	}
 

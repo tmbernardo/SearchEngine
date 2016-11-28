@@ -75,6 +75,16 @@ public class InvertedIndex {
 		return results;
 	}
 
+	/**
+	 * Adds the results of each SearchQuery to the list of results
+	 * 
+	 * @param word
+	 *            string in index to look for
+	 * @param results
+	 *            list of locations for the SearchQuery
+	 * @param resultmap
+	 *            map of search results
+	 */
 	public void addResults(String word, List<SearchQuery> results, Map<String, SearchQuery> resultmap) {
 		for (String location : words.get(word).keySet()) {
 			int count = words.get(word).get(location).size();
@@ -114,8 +124,13 @@ public class InvertedIndex {
 		words.get(word).get(fileName).add(lineNumber);
 	}
 
-	public TreeMap<String, TreeMap<String, TreeSet<Integer>>> wordsCopy() {
-		return new TreeMap<String, TreeMap<String, TreeSet<Integer>>>(words);
+	/**
+	 * Returns the size of the index
+	 * 
+	 * @return size size of the inverted index
+	 */
+	public int getIndexSize() {
+		return this.words.size();
 	}
 
 	/**

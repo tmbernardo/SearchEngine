@@ -58,10 +58,22 @@ public class ConcurrentSearcher {
 		minions.shutdown();
 	}
 
+	/**
+	 * Minion class created for inputed search term(s)
+	 */
 	private class QueryMinion implements Runnable {
 		String[] words;
 		boolean exact;
 
+		/**
+		 * Goes through each search term by calling the corresponding method in
+		 * InvertedIndex
+		 * 
+		 * @param words
+		 *            Search terms to search for in index
+		 * @param exact
+		 *            specifies whether exact or partial search is wanted
+		 */
 		public QueryMinion(String[] words, boolean exact) {
 			this.words = words;
 			this.exact = exact;
