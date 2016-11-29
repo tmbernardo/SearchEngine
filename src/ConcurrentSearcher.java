@@ -44,6 +44,7 @@ public class ConcurrentSearcher {
 		try (BufferedReader reader = Files.newBufferedReader(Paths.get(inputFile), Charset.forName("UTF-8"));) {
 
 			while ((line = reader.readLine()) != null) {
+				// TODO move the cleaning/sorting into minion too
 				String cleaned = line.trim().toLowerCase().replaceAll(regex, "");
 				String[] words = cleaned.split("\\s+");
 				Arrays.sort(words);
@@ -55,6 +56,8 @@ public class ConcurrentSearcher {
 			System.out.println("Problem File: " + line);
 		}
 
+		// TODO it would make sense to call finish() here but not shutdown()
+		// TODO Add a separate shutdown method, Driver will call shutdown()
 		minions.shutdown();
 	}
 
@@ -62,7 +65,7 @@ public class ConcurrentSearcher {
 	 * Minion class created for inputed search term(s)
 	 */
 	private class QueryMinion implements Runnable {
-		String[] words;
+		String[] words; // TODO Usually we still use our proper keywords
 		boolean exact;
 
 		/**
@@ -82,12 +85,29 @@ public class ConcurrentSearcher {
 
 		@Override
 		public void run() {
+			// TODO results is shared data, must be properly synchronized
 			if (exact) {
 				results.put(String.join(" ", words), index.exactSearch(words));
 			} else {
 				results.put(String.join(" ", words), index.partialSearch(words));
 			}
 			logger.debug("Minion for {} completed", String.join(" ", words));
+			
+			/*
+			 * synchronized (results) {
+			 * 		results.put(String.join(" ", words), index.exactSearch(words));
+			 * }
+			 * 
+			 * - or -
+			 * 
+			 * List<SearchQuery> local = index.exactSearch(words);
+			 * 
+			 * synchronized (results) {
+			 * 		results.put(String.join(...), local);
+			 * }
+			 * 
+			 * (this one is better)
+			 */
 		}
 
 	}
@@ -100,6 +120,7 @@ public class ConcurrentSearcher {
 	 *            name of the JSON file to be written to
 	 */
 	public void toJSON(String outputFile) {
+		// TODO protect results here too
 		logger.debug("Writing to {}", outputFile);
 		JSONFileWriter.searchResultsToJSON(Paths.get(outputFile), results);
 	}

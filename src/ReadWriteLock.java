@@ -41,7 +41,9 @@ public class ReadWriteLock {
 	 */
 	public synchronized void unlockReadOnly() {
 		readers--;
-		this.notifyAll();
+		this.notifyAll(); // TODO Only wakes up writers
+		
+		// TODO Over-notifying writers, when do you call notifyAll()? Only do this when readers == 0
 	}
 
 	/**

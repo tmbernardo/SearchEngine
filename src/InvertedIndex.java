@@ -75,6 +75,7 @@ public class InvertedIndex {
 		return results;
 	}
 
+	// TODO Make private, do not override in ConcurrentIndex
 	/**
 	 * Adds the results of each SearchQuery to the list of results
 	 * 
@@ -143,4 +144,17 @@ public class InvertedIndex {
 	public void toJSON(String outputFile) {
 		JSONFileWriter.indexToJSON(Paths.get(outputFile), words);
 	}
+
+	/* TODO
+	public void addAll(InvertedIndex other) {
+		for (String word : other.words.keySet()) {
+			if (this.words.containsKey(word) == false) {
+				this.words.put(word, other.words.get(word));
+			}
+			else {
+				loop through each file, folow the same pattern (put when it makes sense, call addAll() otherwise)
+			}
+		}
+	}
+	*/
 }

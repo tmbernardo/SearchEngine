@@ -26,14 +26,17 @@ public class ConcurrentIndex extends InvertedIndex {
 
 	@Override
 	public List<SearchQuery> exactSearch(String[] queries) {
+		// TODO Need to lock
 		return super.exactSearch(queries);
 	}
 
 	@Override
 	public List<SearchQuery> partialSearch(String[] queries) {
+		// TODO Need to lock
 		return super.partialSearch(queries);
 	}
 
+	// TODO Remove
 	@Override
 	public void addResults(String word, List<SearchQuery> results, Map<String, SearchQuery> resultmap) {
 		lock.lockReadWrite();
@@ -56,8 +59,11 @@ public class ConcurrentIndex extends InvertedIndex {
 
 	@Override
 	public void toJSON(String outputFile) {
+		// TODO Need to lock
 		logger.debug("Writing to {}", outputFile);
 		logger.debug("size of words: {}", super.getIndexSize());
 		super.toJSON(outputFile);
 	}
+
+	// TODO Missing getIndexSize()
 }
