@@ -12,6 +12,7 @@ public class ConcurrentIndexBuilder {
 
 	private static final Logger logger = LogManager.getLogger();
 
+	// TODO Very rare we would want a static work queue, make this a local variable
 	private static WorkQueue minions;
 
 	/**
@@ -60,6 +61,13 @@ public class ConcurrentIndexBuilder {
 		@Override
 		public void run() {
 			InvertedIndexBuilder.parseWordsDir(this.filelocation, index);
+			
+			/*
+			 * TODO
+			 * InvertedIndex local = new InvertedIndex();
+			 * InvertedIndexBuilder.parseWordsDir(this.filelocation, local);
+			 * index.addAll(local);
+			 */
 		}
 
 	}
