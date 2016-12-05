@@ -38,9 +38,7 @@ public class ConcurrentSearcher {
 	 *            if exact searches for the exact term
 	 */
 	public void parseQuery(String inputFile, boolean exact) {
-
 		String line = null;
-
 		try (BufferedReader reader = Files.newBufferedReader(Paths.get(inputFile), Charset.forName("UTF-8"));) {
 
 			while ((line = reader.readLine()) != null) {
@@ -52,6 +50,7 @@ public class ConcurrentSearcher {
 			System.out.println("Searcher: File could not be opened!");
 			System.out.println("Problem File: " + line);
 		}
+		minions.finish();
 	}
 
 	public void shutdownSearch() {
