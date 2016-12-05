@@ -60,13 +60,11 @@ public class Driver {
 
 			if (argParser.hasValue(exact_flag)) {
 				multiThreadSearcher.parseQuery(argParser.getValue(exact_flag), true);
-				multiThreadSearcher.shutdownSearch();
 				multiThreadSearcher.toJSON(argParser.getValue(results_flag, resultsFileName));
 			}
 
 			if (argParser.hasValue(query_flag)) {
 				multiThreadSearcher.parseQuery(argParser.getValue(query_flag), false);
-				multiThreadSearcher.shutdownSearch();
 				multiThreadSearcher.toJSON(argParser.getValue(results_flag, resultsFileName));
 			}
 

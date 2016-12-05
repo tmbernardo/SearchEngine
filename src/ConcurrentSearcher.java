@@ -50,10 +50,6 @@ public class ConcurrentSearcher {
 			System.out.println("Searcher: File could not be opened!");
 			System.out.println("Problem File: " + line);
 		}
-		minions.finish();
-	}
-
-	public void shutdownSearch() {
 		minions.shutdown();
 	}
 
