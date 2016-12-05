@@ -38,26 +38,23 @@ public class ConcurrentSearcher {
 	 *            if exact searches for the exact term
 	 */
 	public void parseQuery(String inputFile, boolean exact) {
-		String regex = "\\p{Punct}+";
+
 		String line = null;
 
 		try (BufferedReader reader = Files.newBufferedReader(Paths.get(inputFile), Charset.forName("UTF-8"));) {
 
 			while ((line = reader.readLine()) != null) {
-				// TODO move the cleaning/sorting into minion too
-				String cleaned = line.trim().toLowerCase().replaceAll(regex, "");
-				String[] words = cleaned.split("\\s+");
-				Arrays.sort(words);
 
-				minions.execute(new QueryMinion(words, exact));
+				minions.execute(new QueryMinion(line, exact));
 			}
+
 		} catch (Exception e) {
 			System.out.println("Searcher: File could not be opened!");
 			System.out.println("Problem File: " + line);
 		}
+	}
 
-		// TODO it would make sense to call finish() here but not shutdown()
-		// TODO Add a separate shutdown method, Driver will call shutdown()
+	public void shutdownSearch() {
 		minions.shutdown();
 	}
 
@@ -65,49 +62,45 @@ public class ConcurrentSearcher {
 	 * Minion class created for inputed search term(s)
 	 */
 	private class QueryMinion implements Runnable {
-		String[] words; // TODO Usually we still use our proper keywords
+		String line;
+		String regex = "\\p{Punct}+";
 		boolean exact;
 
 		/**
 		 * Goes through each search term by calling the corresponding method in
 		 * InvertedIndex
 		 * 
-		 * @param words
+		 * @param line
 		 *            Search terms to search for in index
 		 * @param exact
 		 *            specifies whether exact or partial search is wanted
 		 */
-		public QueryMinion(String[] words, boolean exact) {
-			this.words = words;
+		public QueryMinion(String line, boolean exact) {
+			this.line = line;
 			this.exact = exact;
-			logger.debug("Minion created for {}", String.join(" ", words));
+			logger.debug("Minion created for {}", line);
 		}
 
 		@Override
 		public void run() {
-			// TODO results is shared data, must be properly synchronized
+
+			String cleaned = this.line.trim().toLowerCase().replaceAll(regex, "");
+			String[] queries = cleaned.split("\\s+");
+			Arrays.sort(queries);
+
+			List<SearchQuery> local = null;
+
 			if (exact) {
-				results.put(String.join(" ", words), index.exactSearch(words));
+				local = index.exactSearch(queries);
 			} else {
-				results.put(String.join(" ", words), index.partialSearch(words));
+				local = index.partialSearch(queries);
 			}
-			logger.debug("Minion for {} completed", String.join(" ", words));
-			
-			/*
-			 * synchronized (results) {
-			 * 		results.put(String.join(" ", words), index.exactSearch(words));
-			 * }
-			 * 
-			 * - or -
-			 * 
-			 * List<SearchQuery> local = index.exactSearch(words);
-			 * 
-			 * synchronized (results) {
-			 * 		results.put(String.join(...), local);
-			 * }
-			 * 
-			 * (this one is better)
-			 */
+
+			synchronized (results) {
+				results.put(String.join(" ", queries), local);
+			}
+
+			logger.debug("Minion for {} completed", String.join(" ", queries));
 		}
 
 	}
@@ -120,8 +113,9 @@ public class ConcurrentSearcher {
 	 *            name of the JSON file to be written to
 	 */
 	public void toJSON(String outputFile) {
-		// TODO protect results here too
-		logger.debug("Writing to {}", outputFile);
-		JSONFileWriter.searchResultsToJSON(Paths.get(outputFile), results);
+		synchronized (results) {
+			logger.debug("Writing to {}", outputFile);
+			JSONFileWriter.searchResultsToJSON(Paths.get(outputFile), results);
+		}
 	}
 }

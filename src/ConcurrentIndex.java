@@ -1,5 +1,4 @@
 import java.util.List;
-import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,22 +25,19 @@ public class ConcurrentIndex extends InvertedIndex {
 
 	@Override
 	public List<SearchQuery> exactSearch(String[] queries) {
-		// TODO Need to lock
-		return super.exactSearch(queries);
+		lock.lockReadWrite();
+		try {
+			return super.exactSearch(queries);
+		} finally {
+			lock.unlockReadWrite();
+		}
 	}
 
 	@Override
 	public List<SearchQuery> partialSearch(String[] queries) {
-		// TODO Need to lock
-		return super.partialSearch(queries);
-	}
-
-	// TODO Remove
-	@Override
-	public void addResults(String word, List<SearchQuery> results, Map<String, SearchQuery> resultmap) {
 		lock.lockReadWrite();
 		try {
-			super.addResults(word, results, resultmap);
+			return super.partialSearch(queries);
 		} finally {
 			lock.unlockReadWrite();
 		}
@@ -59,11 +55,20 @@ public class ConcurrentIndex extends InvertedIndex {
 
 	@Override
 	public void toJSON(String outputFile) {
-		// TODO Need to lock
+		lock.lockReadWrite();
 		logger.debug("Writing to {}", outputFile);
 		logger.debug("size of words: {}", super.getIndexSize());
 		super.toJSON(outputFile);
+		lock.unlockReadWrite();
 	}
 
-	// TODO Missing getIndexSize()
+	@Override
+	public int getIndexSize() {
+		lock.lockReadWrite();
+		try {
+			return super.getIndexSize();
+		} finally {
+			lock.unlockReadWrite();
+		}
+	}
 }

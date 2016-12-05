@@ -83,7 +83,7 @@ public class JSONFileWriter {
 	 * 
 	 * @param outputFile
 	 *            name/path to write JSON file to
-	 * @param words
+	 * @param queries
 	 *            TreeMap containing results of search
 	 */
 	public static void searchResultsToJSON(Path outputFile, TreeMap<String, List<SearchQuery>> SearchQueries) {

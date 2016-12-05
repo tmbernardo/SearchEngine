@@ -12,9 +12,6 @@ public class ConcurrentIndexBuilder {
 
 	private static final Logger logger = LogManager.getLogger();
 
-	// TODO Very rare we would want a static work queue, make this a local variable
-	private static WorkQueue minions;
-
 	/**
 	 * Builds the InvertedIndex splitting up work between a specified amount of
 	 * threads by file location
@@ -28,7 +25,7 @@ public class ConcurrentIndexBuilder {
 	 */
 	public static void buildIndex(List<String> fileLocations, ConcurrentIndex index, int threads) {
 
-		minions = new WorkQueue(threads);
+		WorkQueue minions = new WorkQueue(threads);
 
 		for (String filelocation : fileLocations) {
 			minions.execute(new IndexMinion(Paths.get(filelocation), index));
@@ -60,14 +57,10 @@ public class ConcurrentIndexBuilder {
 
 		@Override
 		public void run() {
-			InvertedIndexBuilder.parseWordsDir(this.filelocation, index);
-			
-			/*
-			 * TODO
-			 * InvertedIndex local = new InvertedIndex();
-			 * InvertedIndexBuilder.parseWordsDir(this.filelocation, local);
-			 * index.addAll(local);
-			 */
+
+			InvertedIndex local = new InvertedIndex();
+			InvertedIndexBuilder.parseWordsDir(this.filelocation, local);
+			index.addAll(local);
 		}
 
 	}

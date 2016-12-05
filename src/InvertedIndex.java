@@ -75,7 +75,6 @@ public class InvertedIndex {
 		return results;
 	}
 
-	// TODO Make private, do not override in ConcurrentIndex
 	/**
 	 * Adds the results of each SearchQuery to the list of results
 	 * 
@@ -86,7 +85,7 @@ public class InvertedIndex {
 	 * @param resultmap
 	 *            map of search results
 	 */
-	public void addResults(String word, List<SearchQuery> results, Map<String, SearchQuery> resultmap) {
+	private void addResults(String word, List<SearchQuery> results, Map<String, SearchQuery> resultmap) {
 		for (String location : words.get(word).keySet()) {
 			int count = words.get(word).get(location).size();
 			int index = words.get(word).get(location).first();
@@ -126,6 +125,37 @@ public class InvertedIndex {
 	}
 
 	/**
+	 * This method adds a new cleaned word to the inverted index if it does not
+	 * already exist in the index and is used by concurrentindex
+	 * 
+	 * @param word
+	 *            word to be added to index
+	 * @param lineNumber
+	 *            line where the word is found
+	 * @param fileName
+	 *            name of the file where the word is found
+	 */
+	public void addAll(InvertedIndex other) {
+
+		for (String word : other.words.keySet()) {
+
+			if (this.words.containsKey(word) == false) {
+				this.words.put(word, other.words.get(word));
+
+			} else {
+
+				for (String file : other.words.get(word).keySet()) {
+					if (!this.words.get(word).containsKey(file)) {
+						this.words.get(word).putAll(other.words.get(word));
+					} else {
+						this.words.get(word).get(file).addAll(other.words.get(word).get(file));
+					}
+				}
+			}
+		}
+	}
+
+	/**
 	 * Returns the size of the index
 	 * 
 	 * @return size size of the inverted index
@@ -144,17 +174,4 @@ public class InvertedIndex {
 	public void toJSON(String outputFile) {
 		JSONFileWriter.indexToJSON(Paths.get(outputFile), words);
 	}
-
-	/* TODO
-	public void addAll(InvertedIndex other) {
-		for (String word : other.words.keySet()) {
-			if (this.words.containsKey(word) == false) {
-				this.words.put(word, other.words.get(word));
-			}
-			else {
-				loop through each file, folow the same pattern (put when it makes sense, call addAll() otherwise)
-			}
-		}
-	}
-	*/
 }
