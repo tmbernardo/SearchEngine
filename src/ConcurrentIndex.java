@@ -54,6 +54,13 @@ public class ConcurrentIndex extends InvertedIndex {
 	}
 
 	@Override
+	public void addAll(InvertedIndex local) {
+		lock.lockReadWrite();
+		super.addAll(local);
+		lock.unlockReadWrite();
+	}
+
+	@Override
 	public void toJSON(String outputFile) {
 		lock.lockReadWrite();
 		logger.debug("Writing to {}", outputFile);
