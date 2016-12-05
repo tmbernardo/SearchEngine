@@ -83,7 +83,7 @@ public class ConcurrentSearcher {
 		@Override
 		public void run() {
 
-			String cleaned = this.line.trim().toLowerCase().replaceAll(regex, "");
+			String cleaned = line.trim().toLowerCase().replaceAll(regex, "");
 			String[] queries = cleaned.split("\\s+");
 			Arrays.sort(queries);
 
