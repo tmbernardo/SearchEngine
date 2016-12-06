@@ -10,6 +10,7 @@ public class ConcurrentIndex extends InvertedIndex {
 
 	private static final Logger logger = LogManager.getLogger();
 
+	// TODO final
 	private ReadWriteLock lock;
 
 	/**
@@ -25,6 +26,7 @@ public class ConcurrentIndex extends InvertedIndex {
 
 	@Override
 	public List<SearchQuery> exactSearch(String[] queries) {
+		// TODO lock for read
 		lock.lockReadWrite();
 		try {
 			return super.exactSearch(queries);
@@ -35,6 +37,7 @@ public class ConcurrentIndex extends InvertedIndex {
 
 	@Override
 	public List<SearchQuery> partialSearch(String[] queries) {
+		// TODO lock for read
 		lock.lockReadWrite();
 		try {
 			return super.partialSearch(queries);
@@ -53,6 +56,8 @@ public class ConcurrentIndex extends InvertedIndex {
 		}
 	}
 
+	// TODO Use try/finally just in case there are any runtime exceptions
+	
 	@Override
 	public void addAll(InvertedIndex local) {
 		lock.lockReadWrite();
@@ -62,6 +67,7 @@ public class ConcurrentIndex extends InvertedIndex {
 
 	@Override
 	public void toJSON(String outputFile) {
+		// TODO read, try/finally
 		lock.lockReadWrite();
 		logger.debug("Writing to {}", outputFile);
 		logger.debug("size of words: {}", super.getIndexSize());
@@ -71,6 +77,7 @@ public class ConcurrentIndex extends InvertedIndex {
 
 	@Override
 	public int getIndexSize() {
+		// TODO read only
 		lock.lockReadWrite();
 		try {
 			return super.getIndexSize();

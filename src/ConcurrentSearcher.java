@@ -9,6 +9,9 @@ import java.util.TreeMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+// TODO Create a simple SearcherInterface with parseQuery and toJSON methods
+// TODO Implement that interface in both the single and multi-threaded versions
+
 public class ConcurrentSearcher {
 	private static final Logger logger = LogManager.getLogger();
 
@@ -94,6 +97,8 @@ public class ConcurrentSearcher {
 			} else {
 				local = index.partialSearch(queries);
 			}
+			
+			// TODO Do String.join(" ", queries) outside the synchronized block
 
 			synchronized (results) {
 				results.put(String.join(" ", queries), local);

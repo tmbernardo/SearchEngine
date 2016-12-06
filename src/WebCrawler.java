@@ -18,7 +18,7 @@ public class WebCrawler {
 
 	private final Set<URL> urls;
 	private final Queue<URL> urlQueue;
-	public final InvertedIndex index;
+	public final InvertedIndex index; // TODO private
 
 	/**
 	 * Initializes the urls and urlQueue to save links to
@@ -85,6 +85,9 @@ public class WebCrawler {
 			}
 		}
 	}
+	
+	// TODO public static void addHTML(URL url, String html, InvertedIndex index)
+	// TODO Call this in your concurrent version
 
 	/**
 	 * Parses the html for words and adds the words to the inverted index

@@ -9,6 +9,8 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+// TODO Create an interface and implement in single/multi versions
+
 /**
  * Thread safe version of WebCrawler
  */
@@ -16,9 +18,9 @@ public class ConcurrentWebCrawler {
 
 	private static final Logger logger = LogManager.getLogger();
 
-	private ConcurrentIndex index;
-	private static WorkQueue minions;
-	private Set<URL> urls;
+	private ConcurrentIndex index; // TODO final
+	private static WorkQueue minions; // TODO not static
+	private Set<URL> urls; // TODO final
 
 	private final static int MAXLINKS = 50;
 	private int threads;
@@ -48,7 +50,7 @@ public class ConcurrentWebCrawler {
 	 */
 	public void crawl(String inputURL) {
 
-		urls = new HashSet<URL>();
+		urls = new HashSet<URL>(); // TODO init in constructor
 		minions = new WorkQueue(this.threads);
 
 		try {
@@ -81,6 +83,9 @@ public class ConcurrentWebCrawler {
 		 */
 		public WebCrawlerMinion(URL inputlink) {
 			this.inputlink = inputlink;
+			
+			// TODO You want threads to do this concurrently
+			// TODO And MAIN is what runs the constructor, not the workers
 			this.html = HTMLCleaner.fetchHTML(inputlink.toString());
 			logger.debug("Minion created for {}", inputlink.toString());
 		}
