@@ -101,4 +101,29 @@ public class Driver {
 			}
 		}
 	}
+	
+	/*
+	 * TODO
+	 * 
+	 * InvertedIndex index = null;
+	 * WebCrawlerInterface crawler = null;
+	 * 
+	 * if (-multi) {
+	 * 		ConcurrentIndex concurrent = new ConcurrentIndex();
+	 * 		index = concurrent;
+	 * 
+	 * 		crawler = new ConcurrentWebCrawler(concurrect);
+	 * }
+	 * else {
+	 * 		index = new InvertedIndex();
+	 * 		crawler = new WebCrawler(index);
+	 * }
+	 * 
+	 * if (-url) {
+	 * 		crawler.crawl(url);
+	 * }
+	 * 
+	 * 
+	 * Simplify Driver after creating the interfaces
+	 */
 }
