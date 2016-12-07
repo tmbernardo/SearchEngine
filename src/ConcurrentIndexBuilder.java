@@ -38,7 +38,7 @@ public class ConcurrentIndexBuilder implements IndexBuilderInterface {
 			minions.execute(new IndexMinion(Paths.get(filelocation), index));
 		}
 
-		minions.shutdown();
+		minions.finish();
 	}
 
 	/**

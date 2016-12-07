@@ -98,7 +98,6 @@ public class WorkQueue {
 	 * but threads in-progress will not be interrupted.
 	 */
 	public void shutdown() {
-		finish();
 		// safe to do unsynchronized due to volatile keyword
 		shutdown = true;
 

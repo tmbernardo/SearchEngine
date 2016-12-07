@@ -46,12 +46,12 @@ public class ConcurrentWebCrawler implements CrawlerInterface {
 
 			minions.execute(new WebCrawlerMinion(baseURL));
 
-			minions.finish();
-
 		} catch (IOException e) {
 			System.err.println("ConcurentWebCrawler: Unable to open url");
 			logger.warn("Unable to open url: {}", inputURL, e);
 		}
+
+		minions.finish();
 	}
 
 	/**
