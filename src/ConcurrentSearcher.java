@@ -20,23 +20,14 @@ public class ConcurrentSearcher implements SearcherInterface {
 	 * Constructor that saves the location of the InvertedIndex initializes the
 	 * results treemap
 	 * 
-	 * @param index2
+	 * @param index
 	 */
-	public ConcurrentSearcher(InvertedIndex index2, int threads) {
-		this.index = index2;
+	public ConcurrentSearcher(InvertedIndex index, WorkQueue minions) {
+		this.index = index;
 		this.results = new TreeMap<>();
-		this.minions = new WorkQueue(threads);
+		this.minions = minions;
 	}
 
-	/**
-	 * Goes through search terms in an input file line by line and cleans and
-	 * adds each word to a list then executes
-	 * 
-	 * @param inputFile
-	 *            file to parse search terms from
-	 * @param exact
-	 *            if exact searches for the exact term
-	 */
 	@Override
 	public void parseQuery(String inputFile, boolean exact) {
 		String line = null;
@@ -52,10 +43,6 @@ public class ConcurrentSearcher implements SearcherInterface {
 			System.out.println("Problem File: " + line);
 		}
 		minions.finish();
-	}
-
-	public void shutdownSearch() {
-		minions.shutdown();
 	}
 
 	/**
@@ -101,23 +88,15 @@ public class ConcurrentSearcher implements SearcherInterface {
 			synchronized (results) {
 				results.put(query, local);
 			}
-
 			logger.debug("Minion for {} completed", String.join(" ", queries));
 		}
 
 	}
 
-	/**
-	 * This method writes the search results to a default or custom named JSON
-	 * file
-	 * 
-	 * @param outputFile
-	 *            name of the JSON file to be written to
-	 */
 	@Override
 	public void toJSON(String outputFile) {
+		logger.debug("Writing to {}", outputFile);
 		synchronized (results) {
-			logger.debug("Writing to {}", outputFile);
 			JSONFileWriter.searchResultsToJSON(Paths.get(outputFile), results);
 		}
 	}

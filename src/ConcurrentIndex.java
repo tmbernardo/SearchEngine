@@ -26,7 +26,6 @@ public class ConcurrentIndex extends InvertedIndex {
 	@Override
 	public List<SearchQuery> exactSearch(String[] queries) {
 		lock.lockReadOnly();
-		;
 		try {
 			return super.exactSearch(queries);
 		} finally {

@@ -9,17 +9,23 @@ import java.util.List;
 /**
  * Builds an inverted index from the files passed through to parseWords
  */
-public class InvertedIndexBuilder {
+public class InvertedIndexBuilder implements IndexBuilderInterface {
+	private final InvertedIndex index;
 
 	/**
-	 * Takes in an ArrayList containing the file locations
+	 * Sets the index for use within the class
 	 * 
-	 * @param fileLocations
-	 *            ArrayList of file locations
+	 * @param InvertedIndex
+	 *            object to save word data to
 	 */
-	public static void buildIndex(List<String> fileLocations, InvertedIndex index) {
+	public InvertedIndexBuilder(InvertedIndex index) {
+		this.index = index;
+	}
+
+	@Override
+	public void buildIndex(List<String> fileLocations) {
 		for (String string : fileLocations) {
-			parseWordsDir(Paths.get(string), index);
+			parseWordsDir(Paths.get(string));
 		}
 	}
 
@@ -33,7 +39,7 @@ public class InvertedIndexBuilder {
 	 *            inverted index to add words to
 	 * 
 	 */
-	public static void parseWordsDir(Path inputFile, InvertedIndex index) {
+	private void parseWordsDir(Path inputFile) {
 		int lineNumber = 0;
 
 		try (BufferedReader reader = Files.newBufferedReader(inputFile, Charset.forName("UTF-8"));) {

@@ -1,3 +1,7 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -8,24 +12,27 @@ import org.apache.logging.log4j.Logger;
 /**
  * Thread safe version of InvertedIndexBuilder
  */
-public class ConcurrentIndexBuilder {
+public class ConcurrentIndexBuilder implements IndexBuilderInterface {
 
-	private static final Logger logger = LogManager.getLogger();
+	private final Logger logger = LogManager.getLogger();
+	private final InvertedIndex index;
+	private WorkQueue minions;
 
 	/**
-	 * Builds the InvertedIndex splitting up work between a specified amount of
-	 * threads by file location
+	 * Sets the index for use within the class
 	 * 
-	 * @param fileLocations
-	 *            ArrayList of file locations
-	 * @param index
-	 *            thread safe inverted index
-	 * @param threads
-	 *            number of threads to split up workload with
+	 * @param InvertedIndex
+	 *            object to save word data to
+	 * @param minions
+	 *            WorkQueue object containing helper threads
 	 */
-	public static void buildIndex(List<String> fileLocations, ConcurrentIndex index, int threads) {
+	public ConcurrentIndexBuilder(InvertedIndex index, WorkQueue minions) {
+		this.index = index;
+		this.minions = minions;
+	}
 
-		WorkQueue minions = new WorkQueue(threads);
+	@Override
+	public void buildIndex(List<String> fileLocations) {
 
 		for (String filelocation : fileLocations) {
 			minions.execute(new IndexMinion(Paths.get(filelocation), index));
@@ -37,9 +44,9 @@ public class ConcurrentIndexBuilder {
 	/**
 	 * Creates a minion for an input file location
 	 */
-	private static class IndexMinion implements Runnable {
+	private class IndexMinion implements Runnable {
 		Path filelocation;
-		ConcurrentIndex index;
+		InvertedIndex index;
 
 		/**
 		 * Minion that only parses words from given filelocation path
@@ -49,7 +56,7 @@ public class ConcurrentIndexBuilder {
 		 * @param index
 		 *            thread safe inverted index
 		 */
-		public IndexMinion(Path filelocation, ConcurrentIndex index) {
+		public IndexMinion(Path filelocation, InvertedIndex index) {
 			logger.debug("Minion created for {}", filelocation.toString());
 			this.filelocation = filelocation;
 			this.index = index;
@@ -59,7 +66,25 @@ public class ConcurrentIndexBuilder {
 		public void run() {
 
 			InvertedIndex local = new InvertedIndex();
-			InvertedIndexBuilder.parseWordsDir(this.filelocation, local);
+			int lineNumber = 0;
+
+			try (BufferedReader reader = Files.newBufferedReader(filelocation, Charset.forName("UTF-8"));) {
+				String line = null;
+				String path = filelocation.toString();
+
+				while ((line = reader.readLine()) != null) {
+					for (String word : line.trim().replaceAll("\\p{Punct}+", "").split("\\s+")) {
+						if (!word.isEmpty()) {
+							lineNumber++;
+							local.add(word.trim().toLowerCase(), lineNumber, path);
+						}
+					}
+				}
+
+			} catch (IOException e) {
+				System.out.println("InvertedIndexBuilder: File is invalid!");
+			}
+
 			index.addAll(local);
 		}
 

@@ -32,15 +32,6 @@ public class WebCrawler implements CrawlerInterface {
 		urlQueue = new LinkedList<URL>();
 	}
 
-	/**
-	 * Runs through a URL parsing all of the links within and saves them to a
-	 * queue
-	 * 
-	 * @param inputURL
-	 *            Origin URL to parse links through
-	 * 
-	 * @return urls list of URLs that have been found from originating link
-	 */
 	@Override
 	public void crawl(String inputURL) {
 		try {

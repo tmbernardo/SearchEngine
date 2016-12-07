@@ -25,13 +25,6 @@ public class Searcher implements SearcherInterface {
 		this.results = new TreeMap<>();
 	}
 
-	/**
-	 * Goes through search terms in an input file line by line and cleans and
-	 * adds each word to a list
-	 * 
-	 * @param inputFile
-	 *            file to parse search terms from
-	 */
 	@Override
 	public void parseQuery(String inputFile, boolean exact) {
 		String regex = "\\p{Punct}+";
@@ -56,13 +49,6 @@ public class Searcher implements SearcherInterface {
 		}
 	}
 
-	/**
-	 * This method writes the search results to a default or custom named JSON
-	 * file
-	 * 
-	 * @param outputFile
-	 *            name of the JSON file to be written to
-	 */
 	@Override
 	public void toJSON(String outputFile) {
 		JSONFileWriter.searchResultsToJSON(Paths.get(outputFile), results);

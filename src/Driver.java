@@ -32,36 +32,40 @@ public class Driver {
 		argParser.parseArguments(args);
 
 		InvertedIndex index = null;
+		IndexBuilderInterface builder = null;
 		CrawlerInterface crawler = null;
 		SearcherInterface searcher = null;
+		WorkQueue minions = new WorkQueue();
 
 		if (argParser.hasFlag(multi_flag)) {
 
 			inputThreads = argParser.getValue(multi_flag, defaultThreads);
-
 			if (inputThreads < 1) {
 				System.err.println("Invalid thread input: setting threads to default 5");
 				inputThreads = defaultThreads;
 			}
 			logger.debug("Multithreading index, Threads: {}", argParser.getValue(multi_flag, defaultThreads));
+
+			minions = new WorkQueue(inputThreads);
 			index = new ConcurrentIndex();
-			crawler = new ConcurrentWebCrawler(index, inputThreads);
-			searcher = new ConcurrentSearcher(index, inputThreads);
+			crawler = new ConcurrentWebCrawler(index, minions);
+			searcher = new ConcurrentSearcher(index, minions);
+			builder = new ConcurrentIndexBuilder(index, minions);
 
 		} else {
 
 			index = new InvertedIndex();
 			crawler = new WebCrawler(index);
 			searcher = new Searcher(index);
+			builder = new InvertedIndexBuilder(index);
 		}
 
 		if (argParser.hasValue(dir_flag)) {
 			List<String> fileLocations = DirectoryTraverser.traverse(argParser.getValue(dir_flag));
-			InvertedIndexBuilder.buildIndex(fileLocations, index);
+			builder.buildIndex(fileLocations);
 		}
 
 		if (argParser.hasValue(url_flag)) {
-			crawler = new WebCrawler(index);
 			crawler.crawl(argParser.getValue(url_flag));
 		}
 
@@ -78,5 +82,8 @@ public class Driver {
 		if (argParser.hasFlag(index_flag)) {
 			index.toJSON(argParser.getValue(index_flag, jsonFileName));
 		}
+
+		minions.shutdown();
+		logger.debug("Main shutting down");
 	}
 }

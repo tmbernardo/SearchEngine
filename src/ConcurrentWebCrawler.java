@@ -28,24 +28,15 @@ public class ConcurrentWebCrawler implements CrawlerInterface {
 	 * 
 	 * @param index
 	 *            thread safe InvertedIndex
-	 * @param threads
-	 *            amount of threads/minions to use
+	 * @param minions
+	 *            WorkQueue object containing helper threads
 	 */
-	public ConcurrentWebCrawler(InvertedIndex index, int threads) {
+	public ConcurrentWebCrawler(InvertedIndex index, WorkQueue minions) {
 		this.index = index;
 		this.urls = new HashSet<URL>();
-		this.minions = new WorkQueue(threads);
+		this.minions = minions;
 	}
 
-	/**
-	 * Runs through a URL parsing all of the links within and saves them to a
-	 * queue
-	 * 
-	 * @param inputURL
-	 *            Origin URL to parse links through
-	 * 
-	 * @return urls list of URLs that have been found from originating link
-	 */
 	@Override
 	public void crawl(String inputURL) {
 
@@ -55,7 +46,7 @@ public class ConcurrentWebCrawler implements CrawlerInterface {
 
 			minions.execute(new WebCrawlerMinion(baseURL));
 
-			minions.shutdown();
+			minions.finish();
 
 		} catch (IOException e) {
 			System.err.println("ConcurentWebCrawler: Unable to open url");
