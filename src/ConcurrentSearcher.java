@@ -9,13 +9,10 @@ import java.util.TreeMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-// TODO Create a simple SearcherInterface with parseQuery and toJSON methods
-// TODO Implement that interface in both the single and multi-threaded versions
-
-public class ConcurrentSearcher {
+public class ConcurrentSearcher implements SearcherInterface {
 	private static final Logger logger = LogManager.getLogger();
 
-	private final ConcurrentIndex index;
+	private final InvertedIndex index;
 	private final TreeMap<String, List<SearchQuery>> results;
 	private final WorkQueue minions;
 
@@ -23,10 +20,10 @@ public class ConcurrentSearcher {
 	 * Constructor that saves the location of the InvertedIndex initializes the
 	 * results treemap
 	 * 
-	 * @param index
+	 * @param index2
 	 */
-	public ConcurrentSearcher(ConcurrentIndex index, int threads) {
-		this.index = index;
+	public ConcurrentSearcher(InvertedIndex index2, int threads) {
+		this.index = index2;
 		this.results = new TreeMap<>();
 		this.minions = new WorkQueue(threads);
 	}
@@ -40,6 +37,7 @@ public class ConcurrentSearcher {
 	 * @param exact
 	 *            if exact searches for the exact term
 	 */
+	@Override
 	public void parseQuery(String inputFile, boolean exact) {
 		String line = null;
 		try (BufferedReader reader = Files.newBufferedReader(Paths.get(inputFile), Charset.forName("UTF-8"));) {
@@ -97,11 +95,11 @@ public class ConcurrentSearcher {
 			} else {
 				local = index.partialSearch(queries);
 			}
-			
-			// TODO Do String.join(" ", queries) outside the synchronized block
+
+			String query = String.join(" ", queries);
 
 			synchronized (results) {
-				results.put(String.join(" ", queries), local);
+				results.put(query, local);
 			}
 
 			logger.debug("Minion for {} completed", String.join(" ", queries));
@@ -116,6 +114,7 @@ public class ConcurrentSearcher {
 	 * @param outputFile
 	 *            name of the JSON file to be written to
 	 */
+	@Override
 	public void toJSON(String outputFile) {
 		synchronized (results) {
 			logger.debug("Writing to {}", outputFile);

@@ -26,104 +26,57 @@ public class Driver {
 		String resultsFileName = "results.json";
 		String jsonFileName = "index.json";
 		int defaultThreads = 5;
-
-		InvertedIndex index = new InvertedIndex();
-
-		Searcher searcher = new Searcher(index);
+		int inputThreads;
 
 		ArgumentParser argParser = new ArgumentParser();
 		argParser.parseArguments(args);
 
+		InvertedIndex index = null;
+		CrawlerInterface crawler = null;
+		SearcherInterface searcher = null;
+
 		if (argParser.hasFlag(multi_flag)) {
 
-			int threads = argParser.getValue(multi_flag, defaultThreads);
+			inputThreads = argParser.getValue(multi_flag, defaultThreads);
 
-			if (threads < 1) {
+			if (inputThreads < 1) {
 				System.err.println("Invalid thread input: setting threads to default 5");
-				threads = defaultThreads;
+				inputThreads = defaultThreads;
 			}
-
-			ConcurrentIndex threadSafeIndex = new ConcurrentIndex();
-			ConcurrentSearcher multiThreadSearcher = new ConcurrentSearcher(threadSafeIndex, threads);
-
 			logger.debug("Multithreading index, Threads: {}", argParser.getValue(multi_flag, defaultThreads));
-
-			if (argParser.hasValue(dir_flag)) {
-				List<String> fileLocations = DirectoryTraverser.traverse(argParser.getValue(dir_flag));
-				ConcurrentIndexBuilder.buildIndex(fileLocations, threadSafeIndex, threads);
-			}
-
-			if (argParser.hasValue(url_flag)) {
-				ConcurrentWebCrawler crawler = new ConcurrentWebCrawler(threadSafeIndex, threads);
-				crawler.crawl(argParser.getValue(url_flag));
-			}
-
-			if (argParser.hasValue(exact_flag)) {
-				multiThreadSearcher.parseQuery(argParser.getValue(exact_flag), true);
-				multiThreadSearcher.shutdownSearch();
-				multiThreadSearcher.toJSON(argParser.getValue(results_flag, resultsFileName));
-			}
-
-			if (argParser.hasValue(query_flag)) {
-				multiThreadSearcher.parseQuery(argParser.getValue(query_flag), false);
-				multiThreadSearcher.shutdownSearch();
-				multiThreadSearcher.toJSON(argParser.getValue(results_flag, resultsFileName));
-			}
-
-			if (argParser.hasFlag(index_flag)) {
-				threadSafeIndex.toJSON(argParser.getValue(index_flag, jsonFileName));
-			}
+			index = new ConcurrentIndex();
+			crawler = new ConcurrentWebCrawler(index, inputThreads);
+			searcher = new ConcurrentSearcher(index, inputThreads);
 
 		} else {
 
-			if (argParser.hasValue(dir_flag)) {
-				List<String> fileLocations = DirectoryTraverser.traverse(argParser.getValue(dir_flag));
-				InvertedIndexBuilder.buildIndex(fileLocations, index);
-			}
+			index = new InvertedIndex();
+			crawler = new WebCrawler(index);
+			searcher = new Searcher(index);
+		}
 
-			if (argParser.hasValue(url_flag)) {
-				WebCrawler crawler = new WebCrawler(index);
-				crawler.crawl(argParser.getValue(url_flag));
-			}
+		if (argParser.hasValue(dir_flag)) {
+			List<String> fileLocations = DirectoryTraverser.traverse(argParser.getValue(dir_flag));
+			InvertedIndexBuilder.buildIndex(fileLocations, index);
+		}
 
-			if (argParser.hasValue(exact_flag)) {
-				searcher.parseQuery(argParser.getValue(exact_flag), true);
-				searcher.toJSON(argParser.getValue(results_flag, resultsFileName));
-			}
+		if (argParser.hasValue(url_flag)) {
+			crawler = new WebCrawler(index);
+			crawler.crawl(argParser.getValue(url_flag));
+		}
 
-			if (argParser.hasValue(query_flag)) {
-				searcher.parseQuery(argParser.getValue(query_flag), false);
-				searcher.toJSON(argParser.getValue(results_flag, resultsFileName));
-			}
+		if (argParser.hasValue(exact_flag)) {
+			searcher.parseQuery(argParser.getValue(exact_flag), true);
+			searcher.toJSON(argParser.getValue(results_flag, resultsFileName));
+		}
 
-			if (argParser.hasFlag(index_flag)) {
-				index.toJSON(argParser.getValue(index_flag, jsonFileName));
-			}
+		if (argParser.hasValue(query_flag)) {
+			searcher.parseQuery(argParser.getValue(query_flag), false);
+			searcher.toJSON(argParser.getValue(results_flag, resultsFileName));
+		}
+
+		if (argParser.hasFlag(index_flag)) {
+			index.toJSON(argParser.getValue(index_flag, jsonFileName));
 		}
 	}
-	
-	/*
-	 * TODO
-	 * 
-	 * InvertedIndex index = null;
-	 * WebCrawlerInterface crawler = null;
-	 * 
-	 * if (-multi) {
-	 * 		ConcurrentIndex concurrent = new ConcurrentIndex();
-	 * 		index = concurrent;
-	 * 
-	 * 		crawler = new ConcurrentWebCrawler(concurrect);
-	 * }
-	 * else {
-	 * 		index = new InvertedIndex();
-	 * 		crawler = new WebCrawler(index);
-	 * }
-	 * 
-	 * if (-url) {
-	 * 		crawler.crawl(url);
-	 * }
-	 * 
-	 * 
-	 * Simplify Driver after creating the interfaces
-	 */
 }

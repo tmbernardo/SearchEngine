@@ -9,21 +9,18 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-// TODO Create an interface and implement in single/multi versions
-
 /**
  * Thread safe version of WebCrawler
  */
-public class ConcurrentWebCrawler {
+public class ConcurrentWebCrawler implements CrawlerInterface {
 
 	private static final Logger logger = LogManager.getLogger();
 
-	private ConcurrentIndex index; // TODO final
-	private static WorkQueue minions; // TODO not static
-	private Set<URL> urls; // TODO final
+	private final InvertedIndex index;
+	private WorkQueue minions;
+	private final Set<URL> urls;
 
 	private final static int MAXLINKS = 50;
-	private int threads;
 
 	/**
 	 * saves a thread safe InvertedIndex locally and specifies how many threads
@@ -34,9 +31,10 @@ public class ConcurrentWebCrawler {
 	 * @param threads
 	 *            amount of threads/minions to use
 	 */
-	public ConcurrentWebCrawler(ConcurrentIndex index, int threads) {
-		this.threads = threads;
+	public ConcurrentWebCrawler(InvertedIndex index, int threads) {
 		this.index = index;
+		this.urls = new HashSet<URL>();
+		this.minions = new WorkQueue(threads);
 	}
 
 	/**
@@ -48,10 +46,8 @@ public class ConcurrentWebCrawler {
 	 * 
 	 * @return urls list of URLs that have been found from originating link
 	 */
+	@Override
 	public void crawl(String inputURL) {
-
-		urls = new HashSet<URL>(); // TODO init in constructor
-		minions = new WorkQueue(this.threads);
 
 		try {
 			URL baseURL = new URL(inputURL);
@@ -83,10 +79,6 @@ public class ConcurrentWebCrawler {
 		 */
 		public WebCrawlerMinion(URL inputlink) {
 			this.inputlink = inputlink;
-			
-			// TODO You want threads to do this concurrently
-			// TODO And MAIN is what runs the constructor, not the workers
-			this.html = HTMLCleaner.fetchHTML(inputlink.toString());
 			logger.debug("Minion created for {}", inputlink.toString());
 		}
 
@@ -98,8 +90,9 @@ public class ConcurrentWebCrawler {
 		@Override
 		public void run() {
 			try {
+				this.html = HTMLCleaner.fetchHTML(inputlink.toString());
 				this.addToQueue(inputlink, html);
-				this.parseWordsUrl(inputlink, html);
+				WebCrawler.addHTML(inputlink, html, index);
 				logger.debug("Minion finished {}", inputlink.toString());
 			} catch (Exception e) {
 				logger.warn("Unable to either add URL to queue or parse url: {}", inputlink, e);
@@ -130,26 +123,6 @@ public class ConcurrentWebCrawler {
 							}
 						}
 					}
-				}
-			}
-		}
-
-		/**
-		 * Parses the html for words and adds the words to the inverted index
-		 * 
-		 * @param url
-		 *            url that is currently being parsed
-		 * @param html
-		 *            html to parse
-		 */
-		private void parseWordsUrl(URL url, String html) throws UnknownHostException, IOException {
-			logger.debug("parsing words from {}", url.toString());
-			String[] words = HTMLCleaner.fetchWords(html);
-			int lineNumber = 0;
-			for (String word : words) {
-				lineNumber++;
-				if (!word.isEmpty()) {
-					index.add(word, lineNumber, inputlink.toString());
 				}
 			}
 		}

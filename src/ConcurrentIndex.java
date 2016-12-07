@@ -10,8 +10,7 @@ public class ConcurrentIndex extends InvertedIndex {
 
 	private static final Logger logger = LogManager.getLogger();
 
-	// TODO final
-	private ReadWriteLock lock;
+	private final ReadWriteLock lock;
 
 	/**
 	 * Default Constructor
@@ -26,23 +25,22 @@ public class ConcurrentIndex extends InvertedIndex {
 
 	@Override
 	public List<SearchQuery> exactSearch(String[] queries) {
-		// TODO lock for read
-		lock.lockReadWrite();
+		lock.lockReadOnly();
+		;
 		try {
 			return super.exactSearch(queries);
 		} finally {
-			lock.unlockReadWrite();
+			lock.unlockReadOnly();
 		}
 	}
 
 	@Override
 	public List<SearchQuery> partialSearch(String[] queries) {
-		// TODO lock for read
-		lock.lockReadWrite();
+		lock.lockReadOnly();
 		try {
 			return super.partialSearch(queries);
 		} finally {
-			lock.unlockReadWrite();
+			lock.unlockReadOnly();
 		}
 	}
 
@@ -56,33 +54,35 @@ public class ConcurrentIndex extends InvertedIndex {
 		}
 	}
 
-	// TODO Use try/finally just in case there are any runtime exceptions
-	
 	@Override
 	public void addAll(InvertedIndex local) {
 		lock.lockReadWrite();
-		super.addAll(local);
-		lock.unlockReadWrite();
+		try {
+			super.addAll(local);
+		} finally {
+			lock.unlockReadWrite();
+		}
 	}
 
 	@Override
 	public void toJSON(String outputFile) {
-		// TODO read, try/finally
 		lock.lockReadWrite();
-		logger.debug("Writing to {}", outputFile);
-		logger.debug("size of words: {}", super.getIndexSize());
-		super.toJSON(outputFile);
-		lock.unlockReadWrite();
+		try {
+			logger.debug("Writing to {}", outputFile);
+			logger.debug("size of words: {}", super.getIndexSize());
+			super.toJSON(outputFile);
+		} finally {
+			lock.unlockReadWrite();
+		}
 	}
 
 	@Override
 	public int getIndexSize() {
-		// TODO read only
-		lock.lockReadWrite();
+		lock.lockReadOnly();
 		try {
 			return super.getIndexSize();
 		} finally {
-			lock.unlockReadWrite();
+			lock.unlockReadOnly();
 		}
 	}
 }

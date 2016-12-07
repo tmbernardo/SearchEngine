@@ -10,7 +10,7 @@ import java.util.TreeMap;
  * Parses the queries given in an input file
  */
 
-public class Searcher {
+public class Searcher implements SearcherInterface {
 	private final InvertedIndex index;
 	private final TreeMap<String, List<SearchQuery>> results;
 
@@ -32,6 +32,7 @@ public class Searcher {
 	 * @param inputFile
 	 *            file to parse search terms from
 	 */
+	@Override
 	public void parseQuery(String inputFile, boolean exact) {
 		String regex = "\\p{Punct}+";
 		String line = null;
@@ -62,6 +63,7 @@ public class Searcher {
 	 * @param outputFile
 	 *            name of the JSON file to be written to
 	 */
+	@Override
 	public void toJSON(String outputFile) {
 		JSONFileWriter.searchResultsToJSON(Paths.get(outputFile), results);
 	}

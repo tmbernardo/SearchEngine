@@ -12,13 +12,13 @@ import java.util.Set;
  * This class crawls through a given url, parses all words, and adds the cleaned
  * words to an Inverted Index
  */
-public class WebCrawler {
+public class WebCrawler implements CrawlerInterface {
 
 	private final static int MAXLINKS = 50;
 
 	private final Set<URL> urls;
 	private final Queue<URL> urlQueue;
-	public final InvertedIndex index; // TODO private
+	private final InvertedIndex index;
 
 	/**
 	 * Initializes the urls and urlQueue to save links to
@@ -41,6 +41,7 @@ public class WebCrawler {
 	 * 
 	 * @return urls list of URLs that have been found from originating link
 	 */
+	@Override
 	public void crawl(String inputURL) {
 		try {
 			urlQueue.add(new URL(inputURL));
@@ -85,9 +86,29 @@ public class WebCrawler {
 			}
 		}
 	}
-	
-	// TODO public static void addHTML(URL url, String html, InvertedIndex index)
-	// TODO Call this in your concurrent version
+
+	/**
+	 * Parses the html for words and adds the words to a local inverted index
+	 * 
+	 * @param url
+	 *            url that is currently being parsed
+	 * @param html
+	 *            html to parse
+	 */
+	public static void addHTML(URL url, String html, InvertedIndex index) throws UnknownHostException, IOException {
+		String[] words = HTMLCleaner.fetchWords(html);
+
+		int lineNumber = 0;
+
+		for (String word : words) {
+
+			lineNumber++;
+
+			if (!word.isEmpty()) {
+				index.add(word, lineNumber, url.toString());
+			}
+		}
+	}
 
 	/**
 	 * Parses the html for words and adds the words to the inverted index
