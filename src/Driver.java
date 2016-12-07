@@ -38,7 +38,7 @@ public class Driver {
 		WorkQueue minions = new WorkQueue();
 
 		if (argParser.hasFlag(multi_flag)) {
-
+			minions.shutdown();
 			inputThreads = argParser.getValue(multi_flag, defaultThreads);
 			if (inputThreads < 1) {
 				System.err.println("Invalid thread input: setting threads to default 5");
@@ -72,7 +72,6 @@ public class Driver {
 		if (argParser.hasValue(exact_flag)) {
 			searcher.parseQuery(argParser.getValue(exact_flag), true);
 			searcher.toJSON(argParser.getValue(results_flag, resultsFileName));
-
 		}
 
 		if (argParser.hasValue(query_flag)) {
@@ -83,6 +82,7 @@ public class Driver {
 		if (argParser.hasFlag(index_flag)) {
 			index.toJSON(argParser.getValue(index_flag, jsonFileName));
 		}
+
 		minions.shutdown();
 		logger.debug("Main shutting down");
 	}
