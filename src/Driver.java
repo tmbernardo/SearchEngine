@@ -50,6 +50,16 @@ public class Driver {
 			crawler = new ConcurrentWebCrawler(index, minions);
 			searcher = new ConcurrentSearcher(index, minions);
 			builder = new ConcurrentIndexBuilder(index, minions);
+			
+			// TODO Try this instead so you provide a *concurrent* index to your other classes
+			/*
+			ConcurrentIndex concurrent = new ConcurrentIndex();
+			index = concurrent;
+			
+			crawler = new ConcurrentWebCrawler(concurrent, minions);
+			searcher = new ConcurrentSearcher(concurrent, minions);
+			etc.
+			*/
 
 		} else {
 
@@ -85,6 +95,7 @@ public class Driver {
 		if (argParser.hasFlag(multi_flag)) {
 			minions.shutdown();
 		}
+		
 		logger.debug("Main shutting down");
 	}
 }
