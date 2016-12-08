@@ -25,10 +25,14 @@ public class InvertedIndexBuilder implements IndexBuilderInterface {
 	@Override
 	public void buildIndex(List<String> fileLocations) {
 		for (String string : fileLocations) {
+			// TODO Call IndexBuilderInterface.parseWords(string, index) instead
 			parseWordsDir(Paths.get(string));
 		}
 	}
 
+	// TODO Make this a public static parseWords(Path input, InvertedIndex index) method
+	// TODO And move it to the interface, then use in both builders
+	
 	/**
 	 * Goes through all words in each sub-directory/file passed and adds it to
 	 * the inverted index passed
