@@ -9,7 +9,6 @@ import java.util.TreeMap;
 /**
  * Parses the queries given in an input file
  */
-
 public class Searcher implements SearcherInterface {
 	private final InvertedIndex index;
 	private final TreeMap<String, List<SearchQuery>> results;
@@ -33,6 +32,9 @@ public class Searcher implements SearcherInterface {
 		try (BufferedReader reader = Files.newBufferedReader(Paths.get(inputFile), Charset.forName("UTF-8"));) {
 
 			while ((line = reader.readLine()) != null) {
+				// TODO Minor comment, since you do this in both places, could make a helper method:
+				// TODO public static String[] cleanLine(String line) { replaceAll, split, sort }
+				// TODO And put that method in the interface so both classes can access it
 				String cleaned = line.trim().toLowerCase().replaceAll(regex, "");
 				String[] words = cleaned.split("\\s+");
 				Arrays.sort(words);
