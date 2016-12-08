@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 public class ConcurrentSearcher implements SearcherInterface {
 	private static final Logger logger = LogManager.getLogger();
 
+	// TODO Should make this a ConcurrentIndex instead...
 	private final InvertedIndex index;
 	private final TreeMap<String, List<SearchQuery>> results;
 	private final WorkQueue minions;
