@@ -35,10 +35,9 @@ public class Driver {
 		IndexBuilderInterface builder = null;
 		CrawlerInterface crawler = null;
 		SearcherInterface searcher = null;
-		WorkQueue minions = new WorkQueue();
+		WorkQueue minions = null;
 
 		if (argParser.hasFlag(multi_flag)) {
-			minions.shutdown();
 			inputThreads = argParser.getValue(multi_flag, defaultThreads);
 			if (inputThreads < 1) {
 				System.err.println("Invalid thread input: setting threads to default 5");
@@ -83,7 +82,9 @@ public class Driver {
 			index.toJSON(argParser.getValue(index_flag, jsonFileName));
 		}
 
-		minions.shutdown();
+		if (argParser.hasFlag(multi_flag)) {
+			minions.shutdown();
+		}
 		logger.debug("Main shutting down");
 	}
 }
