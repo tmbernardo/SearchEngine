@@ -44,7 +44,7 @@ public class WebCrawler implements CrawlerInterface {
 				String html = HTMLCleaner.fetchHTML(url.toString());
 
 				this.addToQueue(url, html);
-				this.parseWordsUrl(url, html);
+				this.parseWordsUrl(url, html); // TODO Call addHTML() instead
 
 			}
 		} catch (Exception e) {
@@ -101,6 +101,7 @@ public class WebCrawler implements CrawlerInterface {
 		}
 	}
 
+	// TODO Remove this version and use addHTML instead
 	/**
 	 * Parses the html for words and adds the words to the inverted index
 	 * 
