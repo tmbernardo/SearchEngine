@@ -16,8 +16,8 @@ public class ConcurrentWebCrawler implements CrawlerInterface {
 
 	private static final Logger logger = LogManager.getLogger();
 
-	private final InvertedIndex index;
-	private WorkQueue minions; // TODO I think this can be final too
+	private final ConcurrentIndex index;
+	private final WorkQueue minions;
 	private final Set<URL> urls;
 
 	private final static int MAXLINKS = 50;
@@ -31,7 +31,7 @@ public class ConcurrentWebCrawler implements CrawlerInterface {
 	 * @param minions
 	 *            WorkQueue object containing helper threads
 	 */
-	public ConcurrentWebCrawler(InvertedIndex index, WorkQueue minions) {
+	public ConcurrentWebCrawler(ConcurrentIndex index, WorkQueue minions) {
 		this.index = index;
 		this.urls = new HashSet<URL>();
 		this.minions = minions;

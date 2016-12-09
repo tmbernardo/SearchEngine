@@ -27,9 +27,9 @@ public class WebCrawler implements CrawlerInterface {
 	 *            InvertedIndex to add words to
 	 */
 	public WebCrawler(InvertedIndex index) {
-		this.index = index;
 		urls = new HashSet<URL>();
 		urlQueue = new LinkedList<URL>();
+		this.index = index;
 	}
 
 	@Override
@@ -44,8 +44,7 @@ public class WebCrawler implements CrawlerInterface {
 				String html = HTMLCleaner.fetchHTML(url.toString());
 
 				this.addToQueue(url, html);
-				this.parseWordsUrl(url, html); // TODO Call addHTML() instead
-
+				addHTML(url, html, index);
 			}
 		} catch (Exception e) {
 			System.err.println("getURLs: Unable to open url " + inputURL);
@@ -87,30 +86,6 @@ public class WebCrawler implements CrawlerInterface {
 	 *            html to parse
 	 */
 	public static void addHTML(URL url, String html, InvertedIndex index) throws UnknownHostException, IOException {
-		String[] words = HTMLCleaner.fetchWords(html);
-
-		int lineNumber = 0;
-
-		for (String word : words) {
-
-			lineNumber++;
-
-			if (!word.isEmpty()) {
-				index.add(word, lineNumber, url.toString());
-			}
-		}
-	}
-
-	// TODO Remove this version and use addHTML instead
-	/**
-	 * Parses the html for words and adds the words to the inverted index
-	 * 
-	 * @param url
-	 *            url that is currently being parsed
-	 * @param html
-	 *            html to parse
-	 */
-	private void parseWordsUrl(URL url, String html) throws UnknownHostException, IOException {
 		String[] words = HTMLCleaner.fetchWords(html);
 
 		int lineNumber = 0;

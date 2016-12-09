@@ -2,7 +2,6 @@ import java.io.BufferedReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -12,8 +11,7 @@ import org.apache.logging.log4j.Logger;
 public class ConcurrentSearcher implements SearcherInterface {
 	private static final Logger logger = LogManager.getLogger();
 
-	// TODO Should make this a ConcurrentIndex instead...
-	private final InvertedIndex index;
+	private final ConcurrentIndex index;
 	private final TreeMap<String, List<SearchQuery>> results;
 	private final WorkQueue minions;
 
@@ -23,7 +21,7 @@ public class ConcurrentSearcher implements SearcherInterface {
 	 * 
 	 * @param index
 	 */
-	public ConcurrentSearcher(InvertedIndex index, WorkQueue minions) {
+	public ConcurrentSearcher(ConcurrentIndex index, WorkQueue minions) {
 		this.index = index;
 		this.results = new TreeMap<>();
 		this.minions = minions;
@@ -51,7 +49,7 @@ public class ConcurrentSearcher implements SearcherInterface {
 	 */
 	private class QueryMinion implements Runnable {
 		String line;
-		String regex = "\\p{Punct}+";
+
 		boolean exact;
 
 		/**
@@ -72,9 +70,7 @@ public class ConcurrentSearcher implements SearcherInterface {
 		@Override
 		public void run() {
 
-			String cleaned = line.trim().toLowerCase().replaceAll(regex, "");
-			String[] queries = cleaned.split("\\s+");
-			Arrays.sort(queries);
+			String[] queries = SearcherInterface.cleanLine(line);
 
 			List<SearchQuery> local = null;
 

@@ -38,28 +38,23 @@ public class Driver {
 		WorkQueue minions = null;
 
 		if (argParser.hasFlag(multi_flag)) {
+
 			inputThreads = argParser.getValue(multi_flag, defaultThreads);
+
 			if (inputThreads < 1) {
 				System.err.println("Invalid thread input: setting threads to default 5");
 				inputThreads = defaultThreads;
 			}
 			logger.debug("Multithreading index, Threads: {}", argParser.getValue(multi_flag, defaultThreads));
 
-			minions = new WorkQueue(inputThreads);
-			index = new ConcurrentIndex();
-			crawler = new ConcurrentWebCrawler(index, minions);
-			searcher = new ConcurrentSearcher(index, minions);
-			builder = new ConcurrentIndexBuilder(index, minions);
-			
-			// TODO Try this instead so you provide a *concurrent* index to your other classes
-			/*
 			ConcurrentIndex concurrent = new ConcurrentIndex();
 			index = concurrent;
-			
+
+			minions = new WorkQueue(inputThreads);
+
 			crawler = new ConcurrentWebCrawler(concurrent, minions);
 			searcher = new ConcurrentSearcher(concurrent, minions);
-			etc.
-			*/
+			builder = new ConcurrentIndexBuilder(concurrent, minions);
 
 		} else {
 
@@ -95,7 +90,7 @@ public class Driver {
 		if (argParser.hasFlag(multi_flag)) {
 			minions.shutdown();
 		}
-		
+
 		logger.debug("Main shutting down");
 	}
 }
