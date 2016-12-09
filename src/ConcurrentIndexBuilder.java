@@ -16,7 +16,7 @@ public class ConcurrentIndexBuilder implements IndexBuilderInterface {
 
 	private final Logger logger = LogManager.getLogger();
 	private final InvertedIndex index;
-	private WorkQueue minions;
+	private WorkQueue minions; // TODO final?
 
 	/**
 	 * Sets the index for use within the class
@@ -68,6 +68,8 @@ public class ConcurrentIndexBuilder implements IndexBuilderInterface {
 			InvertedIndex local = new InvertedIndex();
 			int lineNumber = 0;
 
+			// TODO Instead of copy/pasting this code here, see comment in IndexBuilder
+			// TODO and then call IndexBuilderInterface.parseWords(string, local) instead
 			try (BufferedReader reader = Files.newBufferedReader(filelocation, Charset.forName("UTF-8"));) {
 				String line = null;
 				String path = filelocation.toString();

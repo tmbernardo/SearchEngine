@@ -7,12 +7,13 @@ public interface SearcherInterface {
 	 * 
 	 * @param inputFile
 	 *            file to parse search terms from
+	 * @param exact
+	 *            TODO
 	 */
 	public void parseQuery(String inputFile, boolean exact);
 
 	/**
-	 * This method writes the search results to a default or custom named JSON
-	 * file
+	 * Writes the search results to a default or custom named JSON file
 	 * 
 	 * @param outputFile
 	 *            name of the JSON file to be written to

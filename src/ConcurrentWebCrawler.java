@@ -17,7 +17,7 @@ public class ConcurrentWebCrawler implements CrawlerInterface {
 	private static final Logger logger = LogManager.getLogger();
 
 	private final InvertedIndex index;
-	private WorkQueue minions;
+	private WorkQueue minions; // TODO I think this can be final too
 	private final Set<URL> urls;
 
 	private final static int MAXLINKS = 50;
