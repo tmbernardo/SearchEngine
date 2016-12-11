@@ -94,7 +94,10 @@ public class HomeServlet extends HttpServlet {
 				+ "          <div class=\"col-md-12\">" + "            <h1 class=\"text-center\">Search</h1>"
 				+ "          </div>" + "        </div>");
 		printForm(request, response);
-		out.printf("</div>" + "		</div>");
+		out.printf("</div>" + "		</div>" + "<div class=\"section\">" + "      <div class=\"container\">"
+				+ "        <div class=\"text-center\">"
+				+ "          <a href=\"https://github.com/tmbernardo\"><i class=\"fa fa-3x fa-fw fa-github\"></i></a>"
+				+ "        </div>" + "      </div>" + "    </div>");
 		out.printf("%n</body>%n");
 	}
 

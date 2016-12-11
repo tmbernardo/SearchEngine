@@ -131,13 +131,17 @@ public class ResultsServlet extends HttpServlet {
 	private static String getPageTitle(String link) {
 
 		String html = HTMLCleaner.fetchHTML(link);
-		Pattern p = Pattern.compile("<title>(.*?)</title>");
+		Pattern p = Pattern.compile("<title>\\s*?(.*?)\\s*?</title>");
 		Matcher m = p.matcher(html);
 
 		String title = "";
 
 		while (m.find()) {
 			title += m.group(1);
+		}
+
+		if (title.isEmpty()) {
+			title = link;
 		}
 
 		return title;
