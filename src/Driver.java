@@ -22,11 +22,16 @@ public class Driver {
 		String results_flag = "-results";
 		String url_flag = "-url";
 		String multi_flag = "-multi";
+		String port_flag = "-port";
 
 		String resultsFileName = "results.json";
 		String jsonFileName = "index.json";
+
 		int defaultThreads = 5;
 		int inputThreads;
+
+		int defaultPort = 8080;
+		int inputPort;
 
 		ArgumentParser argParser = new ArgumentParser();
 		argParser.parseArguments(args);
@@ -36,8 +41,9 @@ public class Driver {
 		CrawlerInterface crawler = null;
 		SearcherInterface searcher = null;
 		WorkQueue minions = null;
+		BaseServer newServer = null;
 
-		if (argParser.hasFlag(multi_flag)) {
+		if (argParser.hasFlag(multi_flag) | argParser.hasFlag(port_flag)) {
 
 			inputThreads = argParser.getValue(multi_flag, defaultThreads);
 
@@ -55,6 +61,11 @@ public class Driver {
 			crawler = new ConcurrentWebCrawler(concurrent, minions);
 			searcher = new ConcurrentSearcher(concurrent, minions);
 			builder = new ConcurrentIndexBuilder(concurrent, minions);
+
+			if (argParser.hasFlag(port_flag)) {
+				inputPort = argParser.getValue(port_flag, defaultPort);
+				newServer = new BaseServer(inputPort, concurrent);
+			}
 
 		} else {
 
@@ -89,6 +100,11 @@ public class Driver {
 
 		if (argParser.hasFlag(multi_flag)) {
 			minions.shutdown();
+		}
+
+		if (argParser.hasFlag(port_flag)) {
+
+			newServer.startServer();
 		}
 
 		logger.debug("Main shutting down");
