@@ -20,7 +20,9 @@ public class BaseServer {
 		ServletHandler handler = new ServletHandler();
 
 		handler.addServletWithMapping(new ServletHolder(new HomeServlet()), "/");
+		handler.addServletWithMapping(new ServletHolder(new LoginUserServlet()), "/login");
 		handler.addServletWithMapping(new ServletHolder(new ResultsServlet(index)), "/search");
+		handler.addServletWithMapping(new ServletHolder(new LoginRegisterServlet()), "/register");
 
 		server.setHandler(handler);
 		try {

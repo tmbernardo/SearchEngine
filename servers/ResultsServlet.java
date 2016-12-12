@@ -6,7 +6,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -14,8 +13,10 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 
+//TODO clean up request/response parameters to take in PrintWriter out instead
+//TODO clean up all html
 @SuppressWarnings("serial")
-public class ResultsServlet extends HttpServlet {
+public class ResultsServlet extends BaseServlet {
 
 	private final ConcurrentIndex index;
 
@@ -35,11 +36,9 @@ public class ResultsServlet extends HttpServlet {
 
 		log.info("MessageServlet ID " + this.hashCode() + " handling GET request.");
 
-		PrintWriter out = response.getWriter();
-		out.printf("<html>%n%n");
-		HomeServlet.printHead(request, response, "ResultPage");
+		writeHead("ResultPage", response);
 		printBody(request, response, request.getParameter("searchterm"));
-		out.printf("</html>%n");
+		writeFinish(response);
 
 		response.setStatus(HttpServletResponse.SC_OK);
 	}
@@ -55,7 +54,7 @@ public class ResultsServlet extends HttpServlet {
 
 		String searchterm = request.getParameter("searchterm");
 
-		searchterm = searchterm == null ? "nosearchterm" : searchterm;
+		searchterm = searchterm == null ? "" : searchterm;
 
 		// Avoid XSS attacks using Apache Commons StringUtils
 		// Comment out if you don't have this library installed
@@ -69,7 +68,12 @@ public class ResultsServlet extends HttpServlet {
 	private void printBody(HttpServletRequest request, HttpServletResponse response, String searchterm)
 			throws IOException {
 		PrintWriter out = response.getWriter();
-		out.printf("<body>%n");
+
+		String user = getUsername(request);
+
+		String loggedIn = user == null ? "Login" : "Logout";
+		String loglink = user == null ? "/login" : "/login?logout=";
+
 		out.print(String.format(
 				"<div class=\"navbar navbar-default navbar-static-top\">" + "      <div class=\"container\">"
 						+ "        <div class=\"navbar-header\">"
@@ -77,7 +81,7 @@ public class ResultsServlet extends HttpServlet {
 						+ "          <a class=\"navbar-brand\"><span>Matthew Bernardo</span></a>" + "        </div>"
 						+ "        <div class=\"collapse navbar-collapse\" id=\"navbar-ex-collapse\">"
 						+ "          <ul class=\"nav navbar-nav navbar-right\">" + "            <li class=\"active\">"
-						+ "              <a href=\"/\">Home</a>" + "            </li>" + "          </ul>"
+						+ "              <a href=\"%s\">%s</a>" + "            </li>" + "          </ul>"
 						+ "          <div class=\"col-sm-3 col-md-3 pull-right\">"
 						+ "            <form class=\"navbar-form\" role=\"search\" action=\"%s\" method=\"POST\">"
 						+ "              <div class=\"input-group\">"
@@ -86,9 +90,8 @@ public class ResultsServlet extends HttpServlet {
 						+ "                  <button type=\"submit\" class=\"btn btn-success\" type=\"submit\">Submit</button>"
 						+ "                </span>" + "              </div>" + "            </form>"
 						+ "          </div>" + "        </div>" + "      </div>" + "    </div>",
-				request.getServletPath()));
+				loglink, loggedIn, request.getServletPath()));
 		this.printResults(out, searchterm);
-		out.printf("%n</body>%n");
 	}
 
 	private void printResults(PrintWriter out, String searchterm) {
