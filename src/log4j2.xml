@@ -18,7 +18,7 @@
 
 	<Loggers>
 		<!-- This is the configuration used by all other loggers. -->
-		<Root level="DEBUG">
+		<Root level="OFF">
 			<AppenderRef ref="Console" level="INFO" />
 			<AppenderRef ref="FileLog" level="ALL"  />
 		</Root>

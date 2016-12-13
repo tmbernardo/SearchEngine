@@ -11,22 +11,24 @@ public class PassChangeServlet extends BaseServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 		if (getUsername(request) != null) {
+
+			writeHead("Password Change", response);
+			printBody(request, response);
+			writeFinish(response);
+
+		} else {
+			// redirects if user is not logged in
 			response.sendRedirect(response.encodeRedirectURL("/"));
 		}
-
-		writeHead("Register", response);
-		printBody(request, response);
-
-		writeFinish(response);
 	}
 
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		writeHead("Register New User", response);
 
-		String newuser = request.getParameter("user");
-		String newpass = request.getParameter("pass");
-		Status status = dbhandler.registerUser(newuser, newpass);
+		String oldpass = request.getParameter("oldpass");
+		String newpass = request.getParameter("newpass");
+		Status status = dbhandler.updatePass(getUsername(request), oldpass, newpass);
 
 		if (status == Status.OK) {
 			response.sendRedirect(response.encodeRedirectURL("/login?newuser=true"));
@@ -51,10 +53,7 @@ public class PassChangeServlet extends BaseServlet {
 				+ "        <div class=\"collapse navbar-collapse\" id=\"navbar-ex-collapse\">"
 				+ "          <ul class=\"nav navbar-nav navbar-right\">" + "            <li class=\"active\">"
 				+ "              <a href=\"/\">Home</a>" + "            </li>" + "          </ul>" + "        </div>"
-				+ "      </div>" + "    </div>" + "    <div class=\"section\">" + "      <div class=\"container\">"
-				+ "        <div class=\"row\">" + "          <div class=\"col-md-12\">"
-				+ "            <div class=\"page-header\">" + "              <h1>Registration</h1>"
-				+ "            </div>" + "          </div>" + "        </div>" + "      </div>" + "    </div>");
+				+ "      </div>" + "    </div>");
 
 		if (error != null) {
 			String errorMessage = getStatusMessage(error);
@@ -69,29 +68,23 @@ public class PassChangeServlet extends BaseServlet {
 	private void printForm(HttpServletRequest request, PrintWriter out) {
 		assert out != null;
 
-		out.println();
-		out.printf(
-				"<div class=\"section\">" + "      <div class=\"container\">" + "        <div class=\"row\">"
-						+ "          <div class=\"col-md-12\">"
-						+ "            <form class=\"form-horizontal\" role=\"form\" action=\"%s\""
-						+ "            method=\"POST\">" + "              <div class=\"form-group\">"
-						+ "                <div class=\"col-sm-2\">"
-						+ "                  <label for=\"inputuser\" class=\"control-label\">Username</label>"
-						+ "                </div>" + "                <div class=\"col-sm-10\">"
-						+ "                  <input type=\"text\" id=\"inputuser\" placeholder=\"Username\" name=\"user\" class=\"form-control\">"
-						+ "                </div>" + "              </div>" + "              <div class=\"form-group\">"
-						+ "                <div class=\"col-sm-2\">"
-						+ "                  <label for=\"inputPassword\" class=\"control-label\">Password</label>"
-						+ "                </div>" + "                <div class=\"col-sm-10\">"
-						+ "                  <input type=\"password\" id=\"inputPassword\" placeholder=\"Password\" name=\"pass\""
-						+ "                  class=\"form-control\">" + "                </div>"
-						+ "              </div>" + "              <div class=\"form-group\">"
-						+ "                <div class=\"col-sm-offset-2 col-sm-10\">"
-						+ "                  <button type=\"submit\" class=\"btn btn-default\">Register</button>"
-						+ "                </div>" + "              </div>" + "              <div class=\"form-group\">"
-						+ "                <div class=\"col-sm-offset-2 col-sm-10\">"
-						+ "                  <a class=\"btn btn-default\" href=\"/login\">Already Registered? Click here to login</a>"
-						+ "                </div>" + "              </div>" + "            </form>",
-				request.getServletPath());
+		out.printf("<div class=\"section\">" + "      <div class=\"container\">" + "        <div class=\"row\">"
+				+ "          <div class=\"col-md-12\">"
+				+ "            <form class=\"form-horizontal\" role=\"form\" action=\"%s\" method=\"POST\">"
+				+ "              <div class=\"form-group\">" + "                <div class=\"col-sm-2\">"
+				+ "                  <label for=\"oldPassword\" class=\"control-label\">Old password</label>"
+				+ "                </div>" + "                <div class=\"col-sm-10\">"
+				+ "                  <input type=\"password\" id=\"oldPassword\" placeholder=\"Old Password\" name=\"oldpass\""
+				+ "                  class=\"form-control\">" + "                </div>" + "              </div>"
+				+ "              <div class=\"form-group\">" + "                <div class=\"col-sm-2\">"
+				+ "                  <label for=\"newPassword\" class=\"control-label\">New password</label>"
+				+ "                </div>" + "                <div class=\"col-sm-10\">"
+				+ "                  <input type=\"password\" id=\"newPassword\" placeholder=\"New password\" name=\"newpass\""
+				+ "                  class=\"form-control\">" + "                </div>" + "              </div>"
+				+ "              <div class=\"form-group\">"
+				+ "                <div class=\"col-sm-offset-2 col-sm-10\">"
+				+ "                  <button type=\"submit\" class=\"btn btn-default\">Update</button>"
+				+ "                </div>" + "              </div>" + "            </form>" + "          </div>"
+				+ "        </div>" + "      </div>" + "    </div>", request.getServletPath());
 	}
 }

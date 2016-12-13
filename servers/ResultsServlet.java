@@ -129,9 +129,8 @@ public class ResultsServlet extends BaseServlet {
 				String link = searchQuery.getWhere();
 				String pageTitle = getPageTitle(link);
 
-				out.write(
-						String.format("<li class=\"list-group-item\">" + "<a href=\"leaving?visitLink=%s\">%s</a></li>",
-								link, pageTitle));
+				out.write(String.format("<li class=\"list-group-item\">" + "<a href=\"/*?visitLink=%s\">%s</a></li>",
+						link, pageTitle));
 			}
 		}
 

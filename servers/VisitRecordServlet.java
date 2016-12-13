@@ -16,7 +16,7 @@ public class VisitRecordServlet extends BaseServlet {
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String visit = request.getParameter("visitLink");
-
+		
 		String user = getUsername(request);
 
 		if (user != null) {

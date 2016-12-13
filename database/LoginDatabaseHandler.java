@@ -57,6 +57,9 @@ public class LoginDatabaseHandler {
 	/** Used to remove a user from the database. */
 	private static final String DELETE_SQL = "DELETE FROM login_users WHERE username = ?";
 
+	/** Used to remove a user from the database. */
+	private static final String NEW_PASS_SQL = "UPDATE login_users SET password = ? WHERE username = ? AND password = ?";
+
 	/** Used to create a unique table to save user search history **/
 	private static final String CREATE_SEARCHED_SQL = "CREATE TABLE %s_search_hist (searchterm VARCHAR(2000), timestamp VARCHAR(50));";
 
@@ -502,6 +505,65 @@ public class LoginDatabaseHandler {
 
 			if (status == Status.OK) {
 				status = removeUser(connection, username, password);
+			}
+		} catch (Exception ex) {
+			status = Status.CONNECTION_FAILED;
+			log.debug(status, ex);
+		}
+
+		return status;
+	}
+
+	/**
+	 * updates a users password
+	 *
+	 * @param username
+	 *            - username to remove
+	 * @param oldpass
+	 *            - password of user
+	 * @return {@link Status.OK} if removal successful
+	 */
+	private Status updatePass(Connection connection, String username, String oldpass, String newpass) {
+		Status status = Status.ERROR;
+
+		try (PreparedStatement change_pass = connection.prepareStatement(NEW_PASS_SQL);) {
+			String usersalt = getSalt(connection, username);
+			String oldpasshash = getHash(oldpass, usersalt);
+			String newpasshash = getHash(newpass, usersalt);
+
+			change_pass.setString(1, newpasshash);
+			change_pass.setString(2, username);
+			change_pass.setString(3, oldpasshash);
+
+			int count = change_pass.executeUpdate();
+			status = (count == 1) ? Status.OK : Status.INVALID_USER;
+		} catch (SQLException ex) {
+			status = Status.SQL_EXCEPTION;
+			log.debug(status, ex);
+		}
+
+		return status;
+	}
+
+	/**
+	 * Updates a users passwords if their input password is correct
+	 *
+	 * @param username
+	 *            - username to remove
+	 * @param oldpass
+	 *            - password of user
+	 * @return {@link Status.OK} if removal successful
+	 */
+	public Status updatePass(String username, String oldpass, String newpass) {
+		Status status = Status.ERROR;
+
+		log.debug("Replacing password for " + username + ".");
+
+		try (Connection connection = db.getConnection();) {
+			status = authenticateUser(connection, username, oldpass);
+
+			if (status == Status.OK) {
+				status = updatePass(connection, username, oldpass, newpass);
 			}
 		} catch (Exception ex) {
 			status = Status.CONNECTION_FAILED;

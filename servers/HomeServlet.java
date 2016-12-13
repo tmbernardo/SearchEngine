@@ -77,10 +77,12 @@ public class HomeServlet extends BaseServlet {
 		PrintWriter out = response.getWriter();
 
 		String user = getUsername(request);
+		String newPassLink = user == null ? "" : "<li><a href=\"/passchange\">Change Password</a></li>";
 
 		String loggedIn = user == null ? "Login" : "Logout";
 		String loglink = user == null ? "/login" : "/login?logout=";
 
+		// TODO cleanup
 		out.write(String.format("<div class=\"navbar navbar-default navbar-static-top\">"
 				+ "      <div class=\"container\">" + "        <div class=\"navbar-header\">"
 				+ "          <button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\"#navbar-ex-collapse\">"
@@ -89,18 +91,18 @@ public class HomeServlet extends BaseServlet {
 				+ "            <span class=\"icon-bar\"></span>" + "          </button>"
 				+ "          <a class=\"navbar-brand\" href=\"http://github.com/tmbernardo\"><span>Matthew Bernardo</span></a>"
 				+ "        </div>" + "        <div class=\"collapse navbar-collapse\" id=\"navbar-ex-collapse\">"
-				+ "          <ul class=\"nav navbar-nav navbar-right\">" + "            <li class=\"active\">"
-				+ "              <a href=\"%s\">%s</a>" + "            </li>" + "            <li>"
+				+ "          <ul class=\"nav navbar-nav navbar-right\">" + "<li>"
 				+ "<form class=\"navbar-form\" role=\"index\" action=\"%s\" method=\"POST\">"
 				+ "<div class=\"input-group\">"
 				+ "<input type=\"text\" class=\"form-control\" placeholder=\"Enter new seed link\" name=\"seedlink\" id=\"seedlink\">"
 				+ "<span class=\"input-group-btn\">"
 				+ "<button type=\"submit\" class=\"btn btn-success\" type=\"submit\">Submit</button>" + "</span>"
-				+ "</div>" + "</form>" + "            </li>" + "          </ul>" + "        </div>" + "      </div>"
-				+ "    </div>" + "    <div class=\"section\">" + "      <div class=\"container\">"
-				+ "        <div class=\"row\">" + "          <div class=\"col-md-12\">"
-				+ "            <h1 class=\"text-center\">Search</h1>" + "          </div>" + "        </div>", loglink,
-				loggedIn, request.getServletPath()));
+				+ "</div>" + "</form>" + "</li>" + "            <li class=\"active\">"
+				+ "              <a href=\"%s\">%s</a>" + "            </li>" + "%s" + "          </ul>"
+				+ "        </div>" + "      </div>" + "    </div>" + "    <div class=\"section\">"
+				+ "      <div class=\"container\">" + "        <div class=\"row\">"
+				+ "          <div class=\"col-md-12\">" + "            <h1 class=\"text-center\">Search</h1>"
+				+ "          </div>" + "        </div>", request.getServletPath(), loglink, loggedIn, newPassLink));
 
 		printForm(request, response);
 
