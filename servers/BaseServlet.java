@@ -48,7 +48,7 @@ public class BaseServlet extends HttpServlet {
 			writer.printf("%n");
 			writer.printf("<div class=\"col-sm-offset-1 col-sm-10\">");
 			writer.printf("<p class=\"small text-muted\">");
-			writer.printf("Last generated at %s by %s.", getDate(), Thread.currentThread().getName());
+			writer.printf("Last generated at %s", getDate());
 			writer.printf("</div>");
 			writer.printf("</p>%n%n");
 

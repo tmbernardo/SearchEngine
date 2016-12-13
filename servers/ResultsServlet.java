@@ -81,7 +81,8 @@ public class ResultsServlet extends BaseServlet {
 						+ "          <a class=\"navbar-brand\"><span>Matthew Bernardo</span></a>" + "        </div>"
 						+ "        <div class=\"collapse navbar-collapse\" id=\"navbar-ex-collapse\">"
 						+ "          <ul class=\"nav navbar-nav navbar-right\">" + "            <li class=\"active\">"
-						+ "              <a href=\"%s\">%s</a>" + "            </li>" + "          </ul>"
+						+ "              <a href=\"/\">Home</a>" + "            </li>"
+						+ "<li><a href=\"%s\">%s</a> </li>       </ul>"
 						+ "          <div class=\"col-sm-3 col-md-3 pull-right\">"
 						+ "            <form class=\"navbar-form\" role=\"search\" action=\"%s\" method=\"POST\">"
 						+ "              <div class=\"input-group\">"
@@ -91,11 +92,16 @@ public class ResultsServlet extends BaseServlet {
 						+ "                </span>" + "              </div>" + "            </form>"
 						+ "          </div>" + "        </div>" + "      </div>" + "    </div>",
 				loglink, loggedIn, request.getServletPath()));
-		this.printResults(out, searchterm);
+		this.printResults(out, searchterm, user);
 	}
 
-	private void printResults(PrintWriter out, String searchterm) {
+	private void printResults(PrintWriter out, String searchterm, String user) {
+
 		String[] queries = SearcherInterface.cleanLine(searchterm);
+
+		if (user != null) {
+			dbhandler.addSearched(user, String.join(" ", queries), getDate());
+		}
 
 		out.write(String.format("<div class=\"section\">" + "      <div class=\"container\">"
 				+ "        <div class=\"row\">" + "          <div class=\"col-md-12\">"
@@ -123,8 +129,9 @@ public class ResultsServlet extends BaseServlet {
 				String link = searchQuery.getWhere();
 				String pageTitle = getPageTitle(link);
 
-				out.write(String.format("<li class=\"list-group-item\">" + "<a href=\"%s\">%s</a></li>", link,
-						pageTitle));
+				out.write(
+						String.format("<li class=\"list-group-item\">" + "<a href=\"leaving?visitLink=%s\">%s</a></li>",
+								link, pageTitle));
 			}
 		}
 

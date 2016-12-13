@@ -7,6 +7,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import org.apache.logging.log4j.LogManager;
@@ -17,6 +19,8 @@ import org.apache.logging.log4j.Logger;
  *
  * @see LoginServer
  */
+
+// TODO Super messy and repetitive code
 public class LoginDatabaseHandler {
 
 	/** A {@link org.apache.log4j.Logger log4j} logger for debugging. */
@@ -37,9 +41,6 @@ public class LoginDatabaseHandler {
 			+ "userid INTEGER AUTO_INCREMENT PRIMARY KEY, " + "username VARCHAR(32) NOT NULL UNIQUE, "
 			+ "password CHAR(64) NOT NULL, " + "usersalt CHAR(32) NOT NULL);";
 
-	/** Used to create a unique table to save user search history **/
-	private static final String CREATE_HIST_SQL = "CREATE TABLE %s_search_hist (searchterm VARCHAR(2000));";
-
 	/** Used to insert a new user into the database. */
 	private static final String REGISTER_SQL = "INSERT INTO login_users (username, password, usersalt) "
 			+ "VALUES (?, ?, ?);";
@@ -56,7 +57,32 @@ public class LoginDatabaseHandler {
 	/** Used to remove a user from the database. */
 	private static final String DELETE_SQL = "DELETE FROM login_users WHERE username = ?";
 
+	/** Used to create a unique table to save user search history **/
+	private static final String CREATE_SEARCHED_SQL = "CREATE TABLE %s_search_hist (searchterm VARCHAR(2000), timestamp VARCHAR(50));";
+
+	// TODO Create one SQL Table creator for user history and pass through the
+	// values
+	private static final String CREATE_VISIT_SQL = " CREATE TABLE %s_visit_hist (link VARCHAR(2000), timestamp VARCHAR(50));";
+
+	/** Used to remove a user from the database. */
+	private static final String ADD_VISIT_SQL = "INSERT INTO %s_visit_hist (link, timestamp) VALUES (? , ?);";
+
+	/** Used to retrieve a users visit history from the database. */
+	private static final String GET_VISIT_SQL = "SELECT * FROM %s_visit_hist;";
+
+	/** Used to remove a user from the database. */
+	private static final String TRUN_VISIT_SQL = "TRUNCATE %s_visit_hist;";
+
+	/** Used to retrieve a users search history from the database. */
+	private static final String GET_SEARCHED_SQL = "SELECT * FROM %s_search_hist;";
+
 	private static final String DELETE_HIST_SQL = "DROP TABLE %s_search_hist;";
+
+	/** Used to remove a user from the database. */
+	private static final String TRUN_SEARCHED_SQL = "TRUNCATE %s_search_hist;";
+
+	/** Used to remove a user from the database. */
+	private static final String ADD_SEARCHED_SQL = "INSERT INTO %s_search_hist (searchterm, timestamp) VALUES (? , ?);";
 
 	/** Used to configure connection to database. */
 	private DatabaseConnector db;
@@ -282,7 +308,9 @@ public class LoginDatabaseHandler {
 
 		try (PreparedStatement create_user = connection.prepareStatement(REGISTER_SQL);
 				PreparedStatement create_hist = connection
-						.prepareStatement(String.format(CREATE_HIST_SQL, usersalt));) {
+						.prepareStatement(String.format(CREATE_SEARCHED_SQL, usersalt));
+				PreparedStatement create_visit = connection
+						.prepareStatement(String.format(CREATE_VISIT_SQL, usersalt));) {
 			create_user.setString(1, newuser);
 			create_user.setString(2, passhash);
 			create_user.setString(3, usersalt);
@@ -290,6 +318,7 @@ public class LoginDatabaseHandler {
 
 			// creates searchterm history table
 			create_hist.executeUpdate();
+			create_visit.executeUpdate();
 
 			status = Status.OK;
 		} catch (SQLException ex) {
@@ -482,12 +511,52 @@ public class LoginDatabaseHandler {
 		return status;
 	}
 
-	private Status removeHist(Connection connection, String username) throws SQLException {
+	// TODO Create 2 methods for user history adding, deleting, getting
+	// (generalize code)
+	private Status addSearched(Connection connection, String username, String searchterm, String timestamp)
+			throws SQLException {
 		Status status = Status.ERROR;
 
 		String usersalt = getSalt(connection, username);
 
-		try (PreparedStatement del_user_hist = connection.prepareStatement(String.format(DELETE_HIST_SQL, usersalt));) {
+		try (PreparedStatement add_user_hist = connection
+				.prepareStatement(String.format(ADD_SEARCHED_SQL, usersalt));) {
+
+			add_user_hist.setString(1, searchterm);
+			add_user_hist.setString(2, timestamp);
+
+			int count = add_user_hist.executeUpdate();
+			status = (count == 1) ? Status.OK : Status.INVALID_USER;
+		} catch (SQLException ex) {
+			status = Status.SQL_EXCEPTION;
+			log.debug(status, ex);
+		}
+
+		return status;
+	}
+
+	public Status addSearched(String username, String searchterm, String timestamp) {
+		Status status = Status.ERROR;
+
+		log.debug("Adding searchterm to history for " + username + ".");
+
+		try (Connection connection = db.getConnection();) {
+			status = addSearched(connection, username, searchterm, timestamp);
+		} catch (Exception ex) {
+			status = Status.CONNECTION_FAILED;
+			log.debug(status, ex);
+		}
+
+		return status;
+	}
+
+	private Status removeSearched(Connection connection, String username) throws SQLException {
+		Status status = Status.ERROR;
+
+		String usersalt = getSalt(connection, username);
+
+		try (PreparedStatement del_user_hist = connection
+				.prepareStatement(String.format(TRUN_SEARCHED_SQL, usersalt));) {
 
 			int count = del_user_hist.executeUpdate();
 			status = (count == 1) ? Status.OK : Status.INVALID_USER;
@@ -499,30 +568,169 @@ public class LoginDatabaseHandler {
 		return status;
 	}
 
-	public Status removeHist(String username) {
-		// TODO use TRUNCATE (table) instead
+	public Status removeSearched(String username) {
 		Status status = Status.ERROR;
 
 		log.debug("Removing user history for " + username + ".");
 
 		try (Connection connection = db.getConnection();) {
-			status = removeHist(connection, username);
+			status = removeSearched(connection, username);
 		} catch (Exception ex) {
 			status = Status.CONNECTION_FAILED;
 			log.debug(status, ex);
 		}
 
-		// try (Connection connection = db.getConnection();) {
-		// status = authenticateUser(connection, username, password);
-		//
-		// if (status == Status.OK) {
-		// status = removeHist(connection, username);
-		// }
-		// } catch (Exception ex) {
-		// status = Status.CONNECTION_FAILED;
-		// log.debug(status, ex);
-		// }
+		return status;
+	}
+
+	private Map<String, String> getSearched(Connection connection, String username) throws SQLException {
+		Status status = Status.ERROR;
+
+		String usersalt = getSalt(connection, username);
+		Map<String, String> searchhist = null;
+
+		try (PreparedStatement get_user_hist = connection
+				.prepareStatement(String.format(GET_SEARCHED_SQL, usersalt));) {
+
+			searchhist = new HashMap<>();
+			ResultSet results = get_user_hist.executeQuery();
+
+			while (results.next()) {
+				String term = results.getString("searchterm");
+				String timestamp = results.getString("timestamp");
+				searchhist.put(term, timestamp);
+			}
+
+		} catch (SQLException ex) {
+			log.debug(status, ex);
+		}
+		if (searchhist.isEmpty()) {
+			return null;
+		}
+
+		return searchhist;
+	}
+
+	public Map<String, String> getSearched(String username) {
+		Status status = Status.ERROR;
+
+		log.debug("Getting user history for " + username + ".");
+
+		try (Connection connection = db.getConnection();) {
+			return getSearched(connection, username);
+		} catch (Exception ex) {
+			log.debug(status, ex);
+		}
+
+		return null;
+	}
+
+	private Status addVisited(Connection connection, String username, String link, String timestamp)
+			throws SQLException {
+		Status status = Status.ERROR;
+
+		String usersalt = getSalt(connection, username);
+
+		try (PreparedStatement add_user_hist = connection.prepareStatement(String.format(ADD_VISIT_SQL, usersalt));) {
+
+			add_user_hist.setString(1, link);
+			add_user_hist.setString(2, timestamp);
+
+			int count = add_user_hist.executeUpdate();
+			status = (count == 1) ? Status.OK : Status.INVALID_USER;
+		} catch (SQLException ex) {
+			status = Status.SQL_EXCEPTION;
+			log.debug(status, ex);
+		}
 
 		return status;
+	}
+
+	public Status addVisited(String username, String link, String timestamp) {
+		Status status = Status.ERROR;
+
+		log.debug("Adding searchterm to history for " + username + ".");
+
+		try (Connection connection = db.getConnection();) {
+			status = addVisited(connection, username, link, timestamp);
+		} catch (Exception ex) {
+			status = Status.CONNECTION_FAILED;
+			log.debug(status, ex);
+		}
+
+		return status;
+	}
+
+	private Status removeVisited(Connection connection, String username) throws SQLException {
+		Status status = Status.ERROR;
+
+		String usersalt = getSalt(connection, username);
+
+		try (PreparedStatement del_user_hist = connection.prepareStatement(String.format(TRUN_VISIT_SQL, usersalt));) {
+
+			int count = del_user_hist.executeUpdate();
+			status = (count == 1) ? Status.OK : Status.INVALID_USER;
+		} catch (SQLException ex) {
+			status = Status.SQL_EXCEPTION;
+			log.debug(status, ex);
+		}
+
+		return status;
+	}
+
+	public Status removeVisited(String username) {
+		Status status = Status.ERROR;
+
+		log.debug("Removing user history for " + username + ".");
+
+		try (Connection connection = db.getConnection();) {
+			status = removeVisited(connection, username);
+		} catch (Exception ex) {
+			status = Status.CONNECTION_FAILED;
+			log.debug(status, ex);
+		}
+
+		return status;
+	}
+
+	private Map<String, String> getVisit(Connection connection, String username) throws SQLException {
+		Status status = Status.ERROR;
+
+		String usersalt = getSalt(connection, username);
+		Map<String, String> visithist = null;
+
+		try (PreparedStatement get_user_hist = connection.prepareStatement(String.format(GET_VISIT_SQL, usersalt));) {
+
+			visithist = new HashMap<>();
+			ResultSet results = get_user_hist.executeQuery();
+
+			while (results.next()) {
+				String term = results.getString("link");
+				String timestamp = results.getString("timestamp");
+				visithist.put(term, timestamp);
+			}
+
+		} catch (SQLException ex) {
+			log.debug(status, ex);
+		}
+		if (visithist.isEmpty()) {
+			return null;
+		}
+
+		return visithist;
+	}
+
+	public Map<String, String> getVisit(String username) {
+		Status status = Status.ERROR;
+
+		log.debug("Getting user visit history for " + username + ".");
+
+		try (Connection connection = db.getConnection();) {
+			return getVisit(connection, username);
+		} catch (Exception ex) {
+			log.debug(status, ex);
+		}
+
+		return null;
 	}
 }

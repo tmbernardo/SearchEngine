@@ -58,13 +58,15 @@ public class Driver {
 
 			minions = new WorkQueue(inputThreads);
 
-			crawler = new ConcurrentWebCrawler(concurrent, minions);
+			ConcurrentWebCrawler concurrentCrawler = new ConcurrentWebCrawler(concurrent, minions);
+			crawler = concurrentCrawler;
+
 			searcher = new ConcurrentSearcher(concurrent, minions);
 			builder = new ConcurrentIndexBuilder(concurrent, minions);
 
 			if (argParser.hasFlag(port_flag)) {
 				inputPort = argParser.getValue(port_flag, defaultPort);
-				newServer = new BaseServer(inputPort, concurrent);
+				newServer = new BaseServer(inputPort, concurrent, concurrentCrawler);
 			}
 
 		} else {
@@ -98,13 +100,13 @@ public class Driver {
 			index.toJSON(argParser.getValue(index_flag, jsonFileName));
 		}
 
-		if (argParser.hasFlag(multi_flag)) {
-			minions.shutdown();
-		}
-
 		if (argParser.hasFlag(port_flag)) {
 
 			newServer.startServer();
+		}
+
+		if (argParser.hasFlag(multi_flag)) {
+			minions.shutdown();
 		}
 
 		logger.debug("Main shutting down");

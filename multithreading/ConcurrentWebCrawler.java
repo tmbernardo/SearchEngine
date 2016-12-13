@@ -55,6 +55,13 @@ public class ConcurrentWebCrawler implements CrawlerInterface {
 	}
 
 	/**
+	 * Shutsdown the minions
+	 */
+	public void shutdown() {
+		minions.shutdown();
+	}
+
+	/**
 	 * Private minion class used to crawl links
 	 */
 	private class WebCrawlerMinion implements Runnable {
