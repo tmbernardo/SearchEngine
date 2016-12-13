@@ -163,29 +163,4 @@ public class DatabaseConnector {
 		return okay;
 	}
 
-	/**
-	 * Tests whether database configuration (including tunnel) is correct. If
-	 * you see the message "Connection to database established" then your
-	 * settings are correct
-	 *
-	 * @param args
-	 *            unused
-	 */
-	public static void main(String[] args) {
-		try {
-			// TODO Change to database.properties (or whatever you named your
-			// properties file)!
-			DatabaseConnector test = new DatabaseConnector("database.properties");
-			System.out.println("Connecting to " + test.uri);
-
-			if (test.testConnection()) {
-				System.out.println("Connection to database established.");
-			} else {
-				System.err.println("Unable to connect properly to database.");
-			}
-		} catch (Exception e) {
-			System.err.println("Unable to connect properly to database.");
-			System.err.println(e.getMessage());
-		}
-	}
 }

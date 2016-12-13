@@ -15,12 +15,25 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * Base servlet that can be used to create and finish the web pages as well as
+ * handle cookies
+ *
+ */
 @SuppressWarnings("serial")
 public class BaseServlet extends HttpServlet {
 
 	protected static Logger log = LogManager.getLogger();
 	protected static final LoginDatabaseHandler dbhandler = LoginDatabaseHandler.getInstance();
 
+	/**
+	 * Writes the metadata to the webpage
+	 *
+	 * @param title
+	 *            title of the webpage
+	 * @param response
+	 *            Servlet response from the particular webpage
+	 */
 	protected void writeHead(String title, HttpServletResponse response) {
 		try {
 			PrintWriter out = response.getWriter();
@@ -41,6 +54,12 @@ public class BaseServlet extends HttpServlet {
 		}
 	}
 
+	/**
+	 * Finishes writing the web page. adds last generated time to bottom
+	 *
+	 * @param response
+	 *            Servlet response from the particular webpage
+	 */
 	protected void writeFinish(HttpServletResponse response) {
 		try {
 			PrintWriter writer = response.getWriter();
@@ -71,12 +90,24 @@ public class BaseServlet extends HttpServlet {
 		}
 	}
 
+	/**
+	 * Gets the current date and time
+	 *
+	 * @return current date and time
+	 */
 	protected String getDate() {
 		String format = "hh:mm a 'on' EEE, MMM dd, yyyy";
 		DateFormat dateFormat = new SimpleDateFormat(format);
 		return dateFormat.format(Calendar.getInstance().getTime());
 	}
 
+	/**
+	 * Gets the cookie data
+	 *
+	 * @param request
+	 *            Servlet request from the particular webpage
+	 * @return a Map of cookie name as the key and value
+	 */
 	protected Map<String, String> getCookieMap(HttpServletRequest request) {
 		HashMap<String, String> map = new HashMap<String, String>();
 
@@ -91,6 +122,14 @@ public class BaseServlet extends HttpServlet {
 		return map;
 	}
 
+	/**
+	 * Clears the cookies for current session
+	 *
+	 * @param request
+	 *            Servlet request from the particular webpage
+	 * @param response
+	 *            Servlet response from the particular webpage
+	 */
 	protected void clearCookies(HttpServletRequest request, HttpServletResponse response) {
 		Cookie[] cookies = request.getCookies();
 
@@ -105,12 +144,26 @@ public class BaseServlet extends HttpServlet {
 		}
 	}
 
+	/**
+	 * Clears a particular cookie for current session
+	 *
+	 * @param cookieName
+	 *            Name of cookie to delete
+	 * @param response
+	 *            Servlet response from the particular webpage
+	 */
 	protected void clearCookie(String cookieName, HttpServletResponse response) {
 		Cookie cookie = new Cookie(cookieName, null);
 		cookie.setMaxAge(0);
 		response.addCookie(cookie);
 	}
 
+	/**
+	 * Logs data for cookies
+	 *
+	 * @param request
+	 *            Servlet response from the particular webpage
+	 */
 	protected void debugCookies(HttpServletRequest request) {
 		Cookie[] cookies = request.getCookies();
 
@@ -128,6 +181,13 @@ public class BaseServlet extends HttpServlet {
 		}
 	}
 
+	/**
+	 * Gets a particular status message given an error
+	 *
+	 * @param cookieName
+	 *            Name of cookie to delete
+	 * @return response Servlet response from the particular webpage
+	 */
 	protected String getStatusMessage(String errorName) {
 		Status status = null;
 
@@ -141,6 +201,13 @@ public class BaseServlet extends HttpServlet {
 		return status.toString();
 	}
 
+	/**
+	 * Gets a particular status message given a code
+	 *
+	 * @param code
+	 *            error code
+	 * @return error that accompanies given code
+	 */
 	protected String getStatusMessage(int code) {
 		Status status = null;
 
@@ -154,21 +221,14 @@ public class BaseServlet extends HttpServlet {
 		return status.toString();
 	}
 
+	/**
+	 * Gets the username value stored in cookies
+	 *
+	 * @param request
+	 *            Servlet request
+	 * @return null if user does not exist and user if there is
+	 */
 	protected String getUsername(HttpServletRequest request) {
-		Map<String, String> cookies = getCookieMap(request);
-
-		String login = cookies.get("login");
-		String user = cookies.get("name");
-
-		if ((login != null) && login.equals("true") && (user != null)) {
-			// this is not necessarily safe!
-			return user.replaceAll("\\W+", "");
-		}
-
-		return null;
-	}
-
-	protected String delHist(HttpServletRequest request) {
 		Map<String, String> cookies = getCookieMap(request);
 
 		String login = cookies.get("login");

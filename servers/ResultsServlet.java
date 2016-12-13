@@ -13,8 +13,11 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 
-//TODO clean up request/response parameters to take in PrintWriter out instead
-//TODO clean up all html
+/**
+ * Creates a server that displays search results. if there are no search results
+ * given then it redirects to the Home Server
+ *
+ */
 @SuppressWarnings("serial")
 public class ResultsServlet extends BaseServlet {
 
@@ -31,16 +34,23 @@ public class ResultsServlet extends BaseServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		response.setContentType("text/html");
-		response.setStatus(HttpServletResponse.SC_OK);
+		String searchterm = request.getParameter("searchterm");
 
-		log.info("MessageServlet ID " + this.hashCode() + " handling GET request.");
+		if (searchterm != null) {
+			response.setContentType("text/html");
+			response.setStatus(HttpServletResponse.SC_OK);
 
-		writeHead("ResultPage", response);
-		printBody(request, response, request.getParameter("searchterm"));
-		writeFinish(response);
+			log.info("MessageServlet ID " + this.hashCode() + " handling GET request.");
 
-		response.setStatus(HttpServletResponse.SC_OK);
+			writeHead("ResultPage", response);
+			printBody(request, response, searchterm);
+			writeFinish(response);
+
+			response.setStatus(HttpServletResponse.SC_OK);
+		} else {
+			response.sendRedirect(response.encodeRedirectURL("/"));
+		}
+
 	}
 
 	@Override
@@ -65,6 +75,16 @@ public class ResultsServlet extends BaseServlet {
 				response.encodeRedirectURL("/search?searchterm=" + URLEncoder.encode(searchterm, "UTF-8")));
 	}
 
+	/**
+	 * Prints the body of the Results web page.
+	 *
+	 * @param request
+	 *            Servlet request from the particular webpage
+	 * @param response
+	 *            Servlet response from the particular webpage
+	 * @param searchterm
+	 *            search term to search index for
+	 */
 	private void printBody(HttpServletRequest request, HttpServletResponse response, String searchterm)
 			throws IOException {
 		PrintWriter out = response.getWriter();
@@ -72,7 +92,7 @@ public class ResultsServlet extends BaseServlet {
 		String user = getUsername(request);
 
 		String loggedIn = user == null ? "Login" : "Logout";
-		String loglink = user == null ? "/login" : "/login?logout=";
+		String loglink = user == null ? "/login" : "/?logout=";
 
 		out.print(String.format(
 				"<div class=\"navbar navbar-default navbar-static-top\">" + "      <div class=\"container\">"
@@ -95,6 +115,16 @@ public class ResultsServlet extends BaseServlet {
 		this.printResults(out, searchterm, user);
 	}
 
+	/**
+	 * Prints results of the search and saves to history if user is logged in
+	 *
+	 * @param out
+	 *            PrintWriter for current webpage
+	 * @param searchterm
+	 *            search term to search index for
+	 * @param user
+	 *            Current user if logged in
+	 */
 	private void printResults(PrintWriter out, String searchterm, String user) {
 
 		String[] queries = SearcherInterface.cleanLine(searchterm);
@@ -112,31 +142,31 @@ public class ResultsServlet extends BaseServlet {
 				String.join(" ", queries)));
 
 		List<SearchQuery> resultList = index.partialSearch(queries);
-		List<SearchQuery> subList = null;
-
-		// if (resultList.size() > 10) {
-		// subList = resultList.subList(0, 9);
-		// } else {
-		// subList = resultList;
-		// }
-		subList = resultList;
 
 		if (resultList.isEmpty()) {
 			out.write(String.format("<li class=\"list-group-item\">No documents matching \"%s\" were found</li>",
 					searchterm));
 		} else {
-			for (SearchQuery searchQuery : subList) {
+			for (SearchQuery searchQuery : resultList) {
 				String link = searchQuery.getWhere();
 				String pageTitle = getPageTitle(link);
 
-				out.write(String.format("<li class=\"list-group-item\">" + "<a href=\"/*?visitLink=%s\">%s</a></li>",
-						link, pageTitle));
+				out.write(String.format(
+						"<li class=\"list-group-item\">" + "<a href=\"/leaving?visitLink=%s\">%s</a></li>", link,
+						pageTitle));
 			}
 		}
 
 		out.write("</ul>" + "          </div>" + "        </div>" + "      </div>" + "    </div>");
 	}
 
+	/**
+	 * Gets the title for a webpage
+	 *
+	 * @param link
+	 *            link to the webpage taken from the results
+	 * @return title of the web page
+	 */
 	private static String getPageTitle(String link) {
 
 		String html = HTMLCleaner.fetchHTML(link);

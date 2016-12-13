@@ -11,8 +11,10 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 
-//TODO clean up request/response parameters to take in PrintWriter out instead
-//TODO clean up all html
+/**
+ * Handles the home page of the search engine website
+ *
+ */
 @SuppressWarnings("serial")
 public class HomeServlet extends BaseServlet {
 	private static Logger log = Log.getRootLogger();
@@ -31,6 +33,11 @@ public class HomeServlet extends BaseServlet {
 		response.setStatus(HttpServletResponse.SC_OK);
 
 		log.info("MessageServlet ID " + this.hashCode() + " handling GET request.");
+
+		if (request.getParameter("logout") != null) {
+			// if the user clicked logout then their cookies are deleted
+			clearCookies(request, response);
+		}
 
 		writeHead("Homepage", response);
 		printBody(request, response);
@@ -58,7 +65,6 @@ public class HomeServlet extends BaseServlet {
 
 		response.setStatus(HttpServletResponse.SC_OK);
 
-		// TODO I need to handle errors properly
 		if (seedlink != null && !seedlink.trim().isEmpty()) {
 			crawler.crawl(seedlink);
 			crawler.shutdown();
@@ -72,6 +78,15 @@ public class HomeServlet extends BaseServlet {
 
 	}
 
+	/**
+	 * Prints the body of the Home Page. Buttons and information change per
+	 * user/guest
+	 *
+	 * @param request
+	 *            Servlet request from the particular webpage
+	 * @param response
+	 *            Servlet response from the particular webpage
+	 */
 	private void printBody(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 		PrintWriter out = response.getWriter();
@@ -79,10 +94,11 @@ public class HomeServlet extends BaseServlet {
 		String user = getUsername(request);
 		String newPassLink = user == null ? "" : "<li><a href=\"/passchange\">Change Password</a></li>";
 
+		// changes buttons and links to either Login or Logout respectively
 		String loggedIn = user == null ? "Login" : "Logout";
-		String loglink = user == null ? "/login" : "/login?logout=";
+		String loglink = user == null ? "/login" : "/?logout=true";
 
-		// TODO cleanup
+		// HTML for navbar and headers and New Crawl submission
 		out.write(String.format("<div class=\"navbar navbar-default navbar-static-top\">"
 				+ "      <div class=\"container\">" + "        <div class=\"navbar-header\">"
 				+ "          <button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\"#navbar-ex-collapse\">"
@@ -99,10 +115,28 @@ public class HomeServlet extends BaseServlet {
 				+ "<button type=\"submit\" class=\"btn btn-success\" type=\"submit\">Submit</button>" + "</span>"
 				+ "</div>" + "</form>" + "</li>" + "            <li class=\"active\">"
 				+ "              <a href=\"%s\">%s</a>" + "            </li>" + "%s" + "          </ul>"
-				+ "        </div>" + "      </div>" + "    </div>" + "    <div class=\"section\">"
-				+ "      <div class=\"container\">" + "        <div class=\"row\">"
-				+ "          <div class=\"col-md-12\">" + "            <h1 class=\"text-center\">Search</h1>"
-				+ "          </div>" + "        </div>", request.getServletPath(), loglink, loggedIn, newPassLink));
+				+ "        </div>" + "      </div>" + "    </div>", request.getServletPath(), loglink, loggedIn,
+				newPassLink));
+
+		if (request.getParameter("passchangesuccess") != null) {
+			// Lets user know if the password change was a success
+			out.println("<div class=\"text-center\">");
+			out.println("<p class=\"alert alert-success\">Password change was successful!");
+			out.println("</p>");
+			out.println("</div>");
+		}
+		if (request.getParameter("logout") != null) {
+			// Lets user know if the logout was a success
+			clearCookies(request, response);
+			out.println("<div class=\"text-center\">");
+			out.println("<p class=\"alert alert-success\">Successfully logged out.</p>");
+			out.println("</div>");
+		}
+		// Writes the logo
+		out.write("    <div class=\"section\">" + "      <div class=\"container\">" + "        <div class=\"row\">"
+				+ "          <div class=\"col-md-12\">"
+				+ "            <h1 class=\"text-center\">Matt's Search Engine</h1>" + "          </div>"
+				+ "        </div>");
 
 		printForm(request, response);
 
@@ -110,22 +144,35 @@ public class HomeServlet extends BaseServlet {
 		String delVisit = request.getParameter("delVisit");
 
 		if (delSearched != null) {
+			// truncates search history for a user
 			dbhandler.removeSearched(user);
 		} else if (user != null) {
+			// prints search history for a user
 			printSearchHist(out, user);
 		}
 		if (delVisit != null) {
+			// truncates visit history for a user
 			dbhandler.removeVisited(user);
 		} else if (user != null) {
+			// prints visit history for a user
 			printVisitHist(out, user);
 		}
 
+		// prints out github logo with a link to my github :D
 		out.printf("</div>" + "		</div>" + "<div class=\"section\">" + "      <div class=\"container\">"
 				+ "        <div class=\"text-center\">"
 				+ "          <a href=\"https://github.com/tmbernardo\"><i class=\"fa fa-3x fa-fw fa-github\"></i></a>"
 				+ "        </div>" + "      </div>" + "    </div>");
 	}
 
+	/**
+	 * Prints the search form for the Home Page
+	 *
+	 * @param request
+	 *            Servlet request from the particular webpage
+	 * @param response
+	 *            Servlet response from the particular webpage
+	 */
 	public static void printForm(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		PrintWriter out = response.getWriter();
 		out.printf("<div class=\"row\">" + "					<div class=\"col-md-offset-2 col-md-8\">"
@@ -140,6 +187,14 @@ public class HomeServlet extends BaseServlet {
 				+ "				</div>", request.getServletPath());
 	}
 
+	/**
+	 * Prints the search history for the Home Page
+	 *
+	 * @param out
+	 *            PrintWriter for a web page
+	 * @param user
+	 *            user to retrieve search history from
+	 */
 	private static void printSearchHist(PrintWriter out, String user) {
 		Map<String, String> hist = dbhandler.getSearched(user);
 
@@ -156,6 +211,14 @@ public class HomeServlet extends BaseServlet {
 		}
 	}
 
+	/**
+	 * Prints the visit history for the Home Page
+	 *
+	 * @param out
+	 *            PrintWriter for a web page
+	 * @param user
+	 *            user to retrieve visit history from
+	 */
 	private static void printVisitHist(PrintWriter out, String user) {
 		Map<String, String> hist = dbhandler.getVisit(user);
 

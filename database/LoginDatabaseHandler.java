@@ -20,7 +20,6 @@ import org.apache.logging.log4j.Logger;
  * @see LoginServer
  */
 
-// TODO Super messy and repetitive code
 public class LoginDatabaseHandler {
 
 	/** A {@link org.apache.log4j.Logger log4j} logger for debugging. */
@@ -31,10 +30,6 @@ public class LoginDatabaseHandler {
 
 	/** Used to determine if necessary tables are provided. */
 	private static final String TABLES_SQL = "SHOW TABLES LIKE 'login_users';";
-
-	// /** Used to determine if necessary tables are provided. */
-	// private static final String HIST_TABLE_SQL = "SHOW TABLES LIKE
-	// '?_search_hist';";
 
 	/** Used to create necessary tables for this example. */
 	private static final String CREATE_SQL = "CREATE TABLE login_users ("
@@ -57,34 +52,34 @@ public class LoginDatabaseHandler {
 	/** Used to remove a user from the database. */
 	private static final String DELETE_SQL = "DELETE FROM login_users WHERE username = ?";
 
-	/** Used to remove a user from the database. */
+	/** Used to update the user's password */
 	private static final String NEW_PASS_SQL = "UPDATE login_users SET password = ? WHERE username = ? AND password = ?";
 
 	/** Used to create a unique table to save user search history **/
 	private static final String CREATE_SEARCHED_SQL = "CREATE TABLE %s_search_hist (searchterm VARCHAR(2000), timestamp VARCHAR(50));";
 
-	// TODO Create one SQL Table creator for user history and pass through the
-	// values
+	/** Used to create a unique table to save user visit history **/
 	private static final String CREATE_VISIT_SQL = " CREATE TABLE %s_visit_hist (link VARCHAR(2000), timestamp VARCHAR(50));";
 
-	/** Used to remove a user from the database. */
+	/** Used to add a new visit link to user visit history */
 	private static final String ADD_VISIT_SQL = "INSERT INTO %s_visit_hist (link, timestamp) VALUES (? , ?);";
 
 	/** Used to retrieve a users visit history from the database. */
 	private static final String GET_VISIT_SQL = "SELECT * FROM %s_visit_hist;";
 
-	/** Used to remove a user from the database. */
+	/** Used to clear a users visit history */
 	private static final String TRUN_VISIT_SQL = "TRUNCATE %s_visit_hist;";
 
 	/** Used to retrieve a users search history from the database. */
 	private static final String GET_SEARCHED_SQL = "SELECT * FROM %s_search_hist;";
 
+	/** Used to delete the table containing a users search history */
 	private static final String DELETE_HIST_SQL = "DROP TABLE %s_search_hist;";
 
-	/** Used to remove a user from the database. */
+	/** Used to truncate a users search history. */
 	private static final String TRUN_SEARCHED_SQL = "TRUNCATE %s_search_hist;";
 
-	/** Used to remove a user from the database. */
+	/** Used to add a search term into a users search history. */
 	private static final String ADD_SEARCHED_SQL = "INSERT INTO %s_search_hist (searchterm, timestamp) VALUES (? , ?);";
 
 	/** Used to configure connection to database. */
@@ -151,33 +146,6 @@ public class LoginDatabaseHandler {
 
 		assert hex.length() == length;
 		return hex;
-	}
-
-	public Status setupSearchHist() {
-		Status status = Status.ERROR;
-
-		try (Connection connection = db.getConnection(); Statement statement = connection.createStatement();) {
-			if (!statement.executeQuery(TABLES_SQL).next()) {
-				// Table missing, must create
-				log.debug("Creating tables...");
-				statement.executeUpdate(CREATE_SQL);
-
-				// Check if create was successful
-				if (!statement.executeQuery(TABLES_SQL).next()) {
-					status = Status.CREATE_FAILED;
-				} else {
-					status = Status.OK;
-				}
-			} else {
-				log.debug("Tables found.");
-				status = Status.OK;
-			}
-		} catch (Exception ex) {
-			status = Status.CREATE_FAILED;
-			log.debug(status, ex);
-		}
-
-		return status;
 	}
 
 	/**
@@ -552,6 +520,8 @@ public class LoginDatabaseHandler {
 	 *            - username to remove
 	 * @param oldpass
 	 *            - password of user
+	 * @param newpass
+	 *            - new password to change to
 	 * @return {@link Status.OK} if removal successful
 	 */
 	public Status updatePass(String username, String oldpass, String newpass) {
@@ -573,8 +543,21 @@ public class LoginDatabaseHandler {
 		return status;
 	}
 
-	// TODO Create 2 methods for user history adding, deleting, getting
-	// (generalize code)
+	/**
+	 * Adds a search term to database for a specific user
+	 *
+	 * @param connection
+	 *            - active database connection
+	 * @param username
+	 *            - which user to add search term
+	 * @param searchterm
+	 *            - search term to add to database
+	 * @param timestamp
+	 *            - timestamp for searchterm
+	 * @return if add was successful or not
+	 * @throws SQLException
+	 *             if any issues with database connection
+	 */
 	private Status addSearched(Connection connection, String username, String searchterm, String timestamp)
 			throws SQLException {
 		Status status = Status.ERROR;
@@ -597,6 +580,19 @@ public class LoginDatabaseHandler {
 		return status;
 	}
 
+	/**
+	 * Adds a search term to database for a specific user if they exist and are
+	 * logged in
+	 *
+	 * @param username
+	 *            - which user to add search term
+	 * @param searchterm
+	 *            - search term to add to database
+	 * @param timestamp
+	 *            - timestamp for searchterm
+	 * @throws SQLException
+	 *             if any issues with database connection
+	 */
 	public Status addSearched(String username, String searchterm, String timestamp) {
 		Status status = Status.ERROR;
 
@@ -612,6 +608,17 @@ public class LoginDatabaseHandler {
 		return status;
 	}
 
+	/**
+	 * Truncates the search history for a particular user
+	 *
+	 * @param connection
+	 *            - active database connection
+	 * @param username
+	 *            - which user to remove search term
+	 * @return if delete was successful or not
+	 * @throws SQLException
+	 *             if any issues with database connection
+	 */
 	private Status removeSearched(Connection connection, String username) throws SQLException {
 		Status status = Status.ERROR;
 
@@ -630,6 +637,16 @@ public class LoginDatabaseHandler {
 		return status;
 	}
 
+	/**
+	 * Truncates the search history for a particular user if they exist in the
+	 * database
+	 *
+	 * @param username
+	 *            - which user to remove search term
+	 * @return if delete was successful or not
+	 * @throws SQLException
+	 *             if any issues with database connection
+	 */
 	public Status removeSearched(String username) {
 		Status status = Status.ERROR;
 
@@ -645,6 +662,17 @@ public class LoginDatabaseHandler {
 		return status;
 	}
 
+	/**
+	 * Gets the search history for a particular user
+	 *
+	 * @param connection
+	 *            - active database connection
+	 * @param username
+	 *            - which user to get search term history from
+	 * @return Map containing the searchterm as a key and timestamp as the value
+	 * @throws SQLException
+	 *             if any issues with database connection
+	 */
 	private Map<String, String> getSearched(Connection connection, String username) throws SQLException {
 		Status status = Status.ERROR;
 
@@ -673,6 +701,16 @@ public class LoginDatabaseHandler {
 		return searchhist;
 	}
 
+	/**
+	 * Gets the search history for a particular user if they exist in the
+	 * database
+	 *
+	 * @param username
+	 *            - which user to get search term history from
+	 * @return Map containing the searchterm as a key and timestamp as the value
+	 * @throws SQLException
+	 *             if any issues with database connection
+	 */
 	public Map<String, String> getSearched(String username) {
 		Status status = Status.ERROR;
 
@@ -687,6 +725,19 @@ public class LoginDatabaseHandler {
 		return null;
 	}
 
+	/**
+	 * adds a visited link to the database for a particular user
+	 *
+	 * @param connection
+	 *            - active database connection
+	 * @param username
+	 *            - which user to add visited link to
+	 * @param timestamp
+	 *            - timestamp of the link visit
+	 * @return if the add was ok or not
+	 * @throws SQLException
+	 *             if any issues with database connection
+	 */
 	private Status addVisited(Connection connection, String username, String link, String timestamp)
 			throws SQLException {
 		Status status = Status.ERROR;
@@ -708,6 +759,17 @@ public class LoginDatabaseHandler {
 		return status;
 	}
 
+	/**
+	 * adds a visited link to the database for a particular user
+	 *
+	 * @param username
+	 *            - which user to add visited link to
+	 * @param timestamp
+	 *            - timestamp of the link visit
+	 * @return if the add was ok or not
+	 * @throws SQLException
+	 *             if any issues with database connection
+	 */
 	public Status addVisited(String username, String link, String timestamp) {
 		Status status = Status.ERROR;
 
@@ -723,6 +785,17 @@ public class LoginDatabaseHandler {
 		return status;
 	}
 
+	/**
+	 * Truncates visited link history from the database for a particular user
+	 *
+	 * @param connection
+	 *            - active database connection
+	 * @param username
+	 *            - which user to truncate visit history from
+	 * @return if the delete was ok or not
+	 * @throws SQLException
+	 *             if any issues with database connection
+	 */
 	private Status removeVisited(Connection connection, String username) throws SQLException {
 		Status status = Status.ERROR;
 
@@ -740,6 +813,15 @@ public class LoginDatabaseHandler {
 		return status;
 	}
 
+	/**
+	 * Truncates visited link history from the database for a particular user
+	 *
+	 * @param username
+	 *            - which user to add truncate visit history from
+	 * @return if the delete was ok or not
+	 * @throws SQLException
+	 *             if any issues with database connection
+	 */
 	public Status removeVisited(String username) {
 		Status status = Status.ERROR;
 
@@ -755,6 +837,18 @@ public class LoginDatabaseHandler {
 		return status;
 	}
 
+	/**
+	 * Gets visited link history from the database for a particular user
+	 *
+	 * @param connection
+	 *            - active database connection
+	 * @param username
+	 *            - which user's visit history to retrieve
+	 * @return Map of the visit history with link as the key and timestamp as
+	 *         the value
+	 * @throws SQLException
+	 *             if any issues with database connection
+	 */
 	private Map<String, String> getVisit(Connection connection, String username) throws SQLException {
 		Status status = Status.ERROR;
 
@@ -782,6 +876,16 @@ public class LoginDatabaseHandler {
 		return visithist;
 	}
 
+	/**
+	 * Gets visited link history from the database for a particular user
+	 *
+	 * @param username
+	 *            - which user's visit history to retrieve
+	 * @return Map of the visit history with link as the key and timestamp as
+	 *         the value
+	 * @throws SQLException
+	 *             if any issues with database connection
+	 */
 	public Map<String, String> getVisit(String username) {
 		Status status = Status.ERROR;
 

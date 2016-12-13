@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Handles login requests.
  *
- * @see LoginServer
  */
 @SuppressWarnings("serial")
 public class LoginUserServlet extends BaseServlet {
@@ -16,9 +15,13 @@ public class LoginUserServlet extends BaseServlet {
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-		writeHead("Login", response);
-		printBody(request, response);
-		writeFinish(response);
+		if (getUsername(request) == null) {
+			writeHead("Login", response);
+			printBody(request, response);
+			writeFinish(response);
+		} else {
+			response.sendRedirect(response.encodeRedirectURL("/"));
+		}
 	}
 
 	@Override
@@ -44,6 +47,14 @@ public class LoginUserServlet extends BaseServlet {
 		}
 	}
 
+	/**
+	 * Prints the body of the login page.
+	 * 
+	 * @param request
+	 *            Servlet request from the particular webpage
+	 * @param response
+	 *            Servlet response from the particular webpage
+	 */
 	private void printBody(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		PrintWriter out = response.getWriter();
 		String error = request.getParameter("error");
@@ -84,24 +95,25 @@ public class LoginUserServlet extends BaseServlet {
 			out.println("</div>");
 		}
 
-		if (request.getParameter("logout") != null) {
-			clearCookies(request, response);
-			out.println("<div class=\"col-sm-offset-1 col-md-4\">");
-			out.println("<p class=\"alert alert-success\">Successfully logged out.</p>");
-			out.println("</div>");
-		}
-
 		printForm(out, request.getServletPath());
 		out.println("</div>" + "        </div>" + "      </div>" + "    </div>");
 	}
 
+	/**
+	 * Prints the login form for the login page
+	 *
+	 * @param out
+	 *            PrintWriter for the login page
+	 * @param action
+	 *            server path for login page
+	 */
 	private void printForm(PrintWriter out, String action) {
 		assert out != null;
 
 		out.println("<div class=\"section\">" + "      <div class=\"container\">" + "        <div class=\"row\">"
 				+ "          <div class=\"col-md-12\">");
-		out.write(String.format(
-				"<form class=\"form-horizontal\" role=\"form\" action=\"%s\"" + "            method=\"POST\">"
+		out.write(String
+				.format("<form class=\"form-horizontal\" role=\"form\" action=\"%s\"" + "            method=\"POST\">"
 						+ "              <div class=\"form-group\">" + "                <div class=\"col-sm-2\">"
 						+ "                  <label for=\"inputuser\" class=\"control-label\">Username</label>"
 						+ "                </div>" + "                <div class=\"col-sm-10\">"
@@ -118,7 +130,6 @@ public class LoginUserServlet extends BaseServlet {
 						+ "                </div>" + "              </div>" + "              <div class=\"form-group\">"
 						+ "                <div class=\"col-sm-offset-2 col-sm-10\">"
 						+ "                  <a class=\"btn btn-default\" href=\"/register\">New user? Click here to register a new account</a>"
-						+ "                </div>" + "              </div>" + "            </form>",
-				String.join(" ", action)));
+						+ "                </div>" + "              </div>" + "            </form>", action));
 	}
 }

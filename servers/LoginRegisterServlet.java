@@ -4,20 +4,26 @@ import java.io.PrintWriter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * Handles Registration requests
+ *
+ */
 @SuppressWarnings("serial")
 public class LoginRegisterServlet extends BaseServlet {
 
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-		if (getUsername(request) != null) {
+		if (getUsername(request) == null) {
+
+			writeHead("Register", response);
+			printBody(request, response);
+			writeFinish(response);
+
+		} else {
 			response.sendRedirect(response.encodeRedirectURL("/"));
 		}
 
-		writeHead("Register", response);
-		printBody(request, response);
-
-		writeFinish(response);
 	}
 
 	@Override
@@ -37,6 +43,15 @@ public class LoginRegisterServlet extends BaseServlet {
 		}
 	}
 
+	/**
+	 * Prints the body of the Home Page. Buttons and information change per
+	 * user/guest
+	 *
+	 * @param request
+	 *            Servlet request from the particular webpage
+	 * @param response
+	 *            Servlet response from the particular webpage
+	 */
 	private void printBody(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		PrintWriter out = response.getWriter();
 		String error = request.getParameter("error");
@@ -66,6 +81,14 @@ public class LoginRegisterServlet extends BaseServlet {
 		out.println("</div>" + "        </div>" + "      </div>" + "    </div>");
 	}
 
+	/**
+	 * Prints the search form in the navbar for the Home Page
+	 *
+	 * @param request
+	 *            Servlet request from the particular webpage
+	 * @param response
+	 *            Servlet response from the particular webpage
+	 */
 	private void printForm(HttpServletRequest request, PrintWriter out) {
 		assert out != null;
 

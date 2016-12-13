@@ -4,6 +4,10 @@ import java.io.PrintWriter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * Handles password change requests.
+ *
+ */
 @SuppressWarnings("serial")
 public class PassChangeServlet extends BaseServlet {
 
@@ -31,14 +35,22 @@ public class PassChangeServlet extends BaseServlet {
 		Status status = dbhandler.updatePass(getUsername(request), oldpass, newpass);
 
 		if (status == Status.OK) {
-			response.sendRedirect(response.encodeRedirectURL("/login?newuser=true"));
+			response.sendRedirect(response.encodeRedirectURL("/?passchangesuccess=true"));
 		} else {
-			String url = "/register?error=" + status.name();
+			String url = "/passchange?error=" + status.name();
 			url = response.encodeRedirectURL(url);
 			response.sendRedirect(url);
 		}
 	}
 
+	/**
+	 * Prints the body of the Password Change web page.
+	 *
+	 * @param request
+	 *            Servlet request from the particular webpage
+	 * @param response
+	 *            Servlet response from the particular webpage
+	 */
 	private void printBody(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		PrintWriter out = response.getWriter();
 		String error = request.getParameter("error");
@@ -61,10 +73,19 @@ public class PassChangeServlet extends BaseServlet {
 			out.println("<p class=\"alert alert-danger\">" + errorMessage + "</p>");
 			out.println("</div>");
 		}
+
 		printForm(request, out);
 		out.println("</div>" + "        </div>" + "      </div>" + "    </div>");
 	}
 
+	/**
+	 * Prints the password change form for the password change web page
+	 *
+	 * @param request
+	 *            Servlet request from the particular webpage
+	 * @param out
+	 *            PrintWriter for the login web page
+	 */
 	private void printForm(HttpServletRequest request, PrintWriter out) {
 		assert out != null;
 
